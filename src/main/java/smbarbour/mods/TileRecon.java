@@ -38,6 +38,11 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 	}
 
 	@Override
+	public void updateEntity() {
+		this.getPowerReceiver(null).update();
+	}
+
+	@Override
 	public void doWork(PowerHandler workProvider) {
 		if (getStackInSlot(0) == null)
 			return;
