@@ -85,7 +85,7 @@ public class BlockRecon extends BlockContainer {
 		if (player.isSneaking())
 			return false;
 		
-		if (player.getCurrentEquippedItem() != null) {
+		if (Reconstructor.instance.doPipeInteract) {
 			if (BCInteract.isHoldingPipe(player)) {
 				return false;
 			}
