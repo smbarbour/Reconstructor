@@ -1,0 +1,20 @@
+[
+{
+  "modid": "Reconstructor",
+  "name": "Reconstructor",
+  "description": "Repair your stuff using Buildcraft power",
+  "version": "1.2",
+  "mcversion": "1.6",
+  "url": """",
+  "updateUrl": "",
+  "authors": ["smbarbour"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "parent":"",
+  "dependencies": [
+     "mod_MinecraftForge",
+     "BuildCraft|Core"
+  ]
+}
+]

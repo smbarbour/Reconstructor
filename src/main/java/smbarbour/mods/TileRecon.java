@@ -1,34 +1,30 @@
 package smbarbour.mods;
 
-import buildcraft.BuildCraftCore;
 import buildcraft.api.power.IPowerReceptor;
 import buildcraft.api.power.PowerHandler;
 import buildcraft.api.power.PowerHandler.PowerReceiver;
-import buildcraft.core.TileBuildCraft;
-import buildcraft.core.inventory.SimpleInventory;
-import buildcraft.core.proxy.CoreProxy;
-import buildcraft.core.utils.Utils;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import smbarbour.mods.shared.BCInteract;
+import smbarbour.mods.shared.BasicInventory;
+import smbarbour.mods.shared.Utils;
 
-public class TileRecon extends TileBuildCraft implements IPowerReceptor, IInventory {
+public class TileRecon extends TileEntity implements IPowerReceptor, IInventory {
 	public PowerHandler powerHandler;
-	private final SimpleInventory inv;
+	private final BasicInventory inv;
 	public static final int MAX_ENERGY = 1500;
 
 	public TileRecon(){
 		powerHandler = new PowerHandler(this, PowerHandler.Type.MACHINE);
 		initPowerProvider();
 		
-		inv = new SimpleInventory(1,"Processing",1);
+		inv = new BasicInventory(1,"Processing",1);
 	}
 
 	private void initPowerProvider() {
@@ -62,13 +58,20 @@ public class TileRecon extends TileBuildCraft implements IPowerReceptor, IInvent
 		}
 	}
 
+	@Override
+	public World getWorld() {
+		return null;
+	}
+
 	private void ejectItem() {
-		if (Utils.addToRandomPipeAround(worldObj, xCoord, yCoord, zCoord, ForgeDirection.UNKNOWN, getStackInSlot(0)) > 0) {
-			decrStackSize(0, 1);
-			return;
+		if (Reconstructor.instance.doPipeInteract) {
+			if (BCInteract.addToPipe(worldObj, xCoord, yCoord, zCoord, ForgeDirection.UNKNOWN, getStackInSlot(0)) > 0) {
+				decrStackSize(0, 1);
+				return;
+			}
 		}
 
-		if (Utils.addToRandomInventoryAround(worldObj, xCoord, yCoord, zCoord, getStackInSlot(0)) > 0) {
+		if (Utils.addToRandomInventory(worldObj, xCoord, yCoord, zCoord, getStackInSlot(0)) > 0) {
 			decrStackSize(0, 1);
 			return;
 		}
@@ -124,6 +127,11 @@ public class TileRecon extends TileBuildCraft implements IPowerReceptor, IInvent
 	}
 
 	@Override
+	public boolean isInvNameLocalized() {
+		return false;
+	}
+
+	@Override
 	public int getInventoryStackLimit() {
 		return 1;
 	}
@@ -142,7 +150,7 @@ public class TileRecon extends TileBuildCraft implements IPowerReceptor, IInvent
 	}
 
 	public boolean onBlockActivated(EntityPlayer player, ForgeDirection orientation) {
-		if (!CoreProxy.proxy.isRenderWorld(worldObj)) {
+		if (!worldObj.isRemote) {
 			player.openGui(Reconstructor.instance, 0, worldObj, xCoord, yCoord, zCoord);
 		}
 		return true;

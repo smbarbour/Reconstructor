@@ -1,15 +1,8 @@
 package smbarbour.mods;
 
-import java.util.ArrayList;
-
-import buildcraft.core.BlockBuildCraft;
+import buildcraft.api.core.Position;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import buildcraft.api.core.Position;
-import buildcraft.core.CreativeTabBuildCraft;
-import buildcraft.core.IItemPipe;
-import buildcraft.core.proxy.CoreProxy;
-import buildcraft.core.utils.Utils;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
@@ -20,8 +13,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
+import smbarbour.mods.shared.BCInteract;
+import smbarbour.mods.shared.Utils;
 
-public class BlockRecon extends BlockBuildCraft {
+import java.util.ArrayList;
+
+public class BlockRecon extends BlockContainer {
 
 	Icon textureTop;
 	Icon textureFront;
@@ -89,13 +86,13 @@ public class BlockRecon extends BlockBuildCraft {
 			return false;
 		
 		if (player.getCurrentEquippedItem() != null) {
-			if (player.getCurrentEquippedItem().getItem() instanceof IItemPipe) {
+			if (BCInteract.isHoldingPipe(player)) {
 				return false;
 			}
 		}
 		
-		if (tile instanceof TileRecon) {
-			return ((TileRecon) tile).onBlockActivated(player, ForgeDirection.getOrientation(side));
+		if (tile != null) {
+			return tile.onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
 		
 		return false;

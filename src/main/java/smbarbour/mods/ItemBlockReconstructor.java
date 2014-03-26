@@ -1,6 +1,5 @@
 package smbarbour.mods;
 
-import buildcraft.core.utils.StringUtils;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
