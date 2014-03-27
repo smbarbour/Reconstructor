@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 public class ContainerRecon extends Container {
 
@@ -29,4 +30,8 @@ public class ContainerRecon extends Container {
 		return tile.isUseableByPlayer(entityplayer);
 	}
 
+	@Override
+	public ItemStack slotClick(int slot, int button, int modifier, EntityPlayer player) {
+		return super.slotClick(slot, button, modifier, player);
+	}
 }

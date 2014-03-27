@@ -13,6 +13,10 @@ public class BCInteract
 	}
 
 	public static boolean isHoldingPipe(EntityPlayer player) {
-		return (player.getCurrentEquippedItem().getItem() instanceof IItemPipe);
+		if (player.getCurrentEquippedItem() != null) {
+			return (player.getCurrentEquippedItem().getItem() instanceof IItemPipe);
+		} else {
+			return false;
+		}
 	}
 }

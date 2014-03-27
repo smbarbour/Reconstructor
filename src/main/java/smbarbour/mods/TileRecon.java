@@ -39,7 +39,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 
 	@Override
 	public void updateEntity() {
-		this.getPowerReceiver(null).update();
+		powerHandler.update();
 	}
 
 	@Override
@@ -108,6 +108,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
+		System.out.println("TileRecon getStackInSlot(" + slot + "): " + (inv.getStackInSlot(slot) == null ? "null" : inv.getStackInSlot(slot).toString()));
 		return inv.getStackInSlot(slot);
 	}
 
@@ -166,7 +167,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 		super.readFromNBT(data);
 		inv.readFromNBT(data);
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
