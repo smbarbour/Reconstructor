@@ -6,7 +6,7 @@ import buildcraft.api.power.PowerHandler.PowerReceiver;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -47,7 +47,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 		if (getStackInSlot(0) == null)
 			return;
 			
-		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable()) {
+		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
 			ejectItem();
 			return;
 		}

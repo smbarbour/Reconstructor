@@ -29,7 +29,6 @@ public class BasicInventory implements IInventory
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		System.out.println("BasicInventory (" + slot + "): " + (contents[slot] == null ? "null" : contents[slot].toString()));
 		return contents[slot];
 	}
 

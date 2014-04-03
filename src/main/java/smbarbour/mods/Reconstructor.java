@@ -27,6 +27,7 @@ public class Reconstructor {
 	public boolean useBCRecipe;
 	public boolean useTERecipe;
 	public boolean doPipeInteract = false;
+	public boolean restrictRepairs;
 	@Instance("Reconstructor")
 	public static Reconstructor instance;
 
@@ -45,6 +46,7 @@ public class Reconstructor {
 		energyPerPoint = config.get("General", "MJ_per_damage_point", 5).getInt(5);
 		useBCRecipe = config.get("General", "BC_Recipe", true).getBoolean(true);
 		useTERecipe = config.get("General", "TE_Recipe", true).getBoolean(true);
+		restrictRepairs = config.get("General", "Restricted", false, "If true, will only repair things that extend the tool, armor, sword and bow classes.").getBoolean(false);
 		if (config.hasChanged()) {
 			config.save();
 		}
