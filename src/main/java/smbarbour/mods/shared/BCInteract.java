@@ -4,7 +4,7 @@ import buildcraft.core.IItemPipe;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BCInteract
 {
@@ -13,10 +13,6 @@ public class BCInteract
 	}
 
 	public static boolean isHoldingPipe(EntityPlayer player) {
-		if (player.getCurrentEquippedItem() != null) {
-			return (player.getCurrentEquippedItem().getItem() instanceof IItemPipe);
-		} else {
-			return false;
-		}
+        return player.getCurrentEquippedItem() != null && (player.getCurrentEquippedItem().getItem() instanceof IItemPipe);
 	}
 }

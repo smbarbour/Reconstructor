@@ -5,31 +5,29 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import smbarbour.mods.shared.BCInteract;
 import smbarbour.mods.shared.Utils;
 
-import java.util.ArrayList;
-
 public class BlockRecon extends BlockContainer {
 
-	Icon textureTop;
-	Icon textureFront;
-	Icon textureSide;
+	IIcon textureTop;
+	IIcon textureFront;
+	IIcon textureSide;
 	
-	public BlockRecon(int par1) {
-		super(par1, Material.iron);
+	public BlockRecon() {
+		super(Material.iron);
 		setHardness(10F);
 		setResistance(10F);
-		setStepSound(soundMetalFootstep);
-		setUnlocalizedName("reconstructorBlock");
+		setStepSound(soundTypeMetal);
+		setBlockName("reconstructorBlock");
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class BlockRecon extends BlockContainer {
 	}
 
 	@Override
-	public Icon getIcon(int i, int j) {
+	public IIcon getIcon(int i, int j) {
 		// If no metadata is set, then this is an icon.
 		if (j == 0 && i == 3)
 			return textureFront;
@@ -59,19 +57,13 @@ public class BlockRecon extends BlockContainer {
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World world) {
+	public TileEntity createNewTileEntity(World world, int i) {
 		return new TileRecon();
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public void addCreativeItems(ArrayList itemList) {
-		itemList.add(new ItemStack(this));
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(IconRegister iconRegistry)
+	public void registerBlockIcons(IIconRegister iconRegistry)
 	{
 	    textureFront = iconRegistry.registerIcon("reconstructor:reconstructor_front");
         textureSide = iconRegistry.registerIcon("reconstructor:reconstructor_side");
@@ -80,7 +72,7 @@ public class BlockRecon extends BlockContainer {
 	
 	@Override
 	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer player, int side, float par7, float par8, float par9) {
-		TileRecon tile = (TileRecon) world.getBlockTileEntity(i, j, k);
+		TileRecon tile = (TileRecon) world.getTileEntity(i, j, k);
 		
 		if (player.isSneaking())
 			return false;

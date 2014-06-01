@@ -3,7 +3,7 @@ package smbarbour.mods.shared;
 import smbarbour.mods.shared.InventoryIterator.IInvSlot;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Iterator;
 

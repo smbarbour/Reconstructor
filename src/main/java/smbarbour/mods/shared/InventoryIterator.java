@@ -3,7 +3,7 @@ package smbarbour.mods.shared;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>

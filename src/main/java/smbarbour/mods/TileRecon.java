@@ -10,7 +10,7 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import smbarbour.mods.shared.BCInteract;
 import smbarbour.mods.shared.BasicInventory;
 import smbarbour.mods.shared.Utils;
@@ -31,7 +31,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 		powerHandler.configure((Reconstructor.energyPerPoint * 2), (Reconstructor.energyPerPoint * 20), Reconstructor.energyPerPoint, MAX_ENERGY);
 		powerHandler.configurePowerPerdition(1, 1);
 	}
-	
+
 	@Override
 	public PowerReceiver getPowerReceiver(ForgeDirection side) {
 		return powerHandler.getPowerReceiver();
@@ -42,7 +42,8 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 		getPowerReceiver(null).update();
 	}
 
-	@Override
+
+    @Override
 	public void doWork(PowerHandler workProvider) {
 		if (getStackInSlot(0) == null)
 			return;
@@ -51,8 +52,8 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 			ejectItem();
 			return;
 		}
-		float powerUsed = powerHandler.useEnergy(Reconstructor.energyPerPoint, (Reconstructor.energyPerPoint * 10), true);
-		if (powerUsed < (float) Reconstructor.energyPerPoint){
+		double powerUsed = powerHandler.useEnergy(Reconstructor.energyPerPoint, (Reconstructor.energyPerPoint * 10), true);
+		if (powerUsed < (double) Reconstructor.energyPerPoint){
 			return;		
 		}
 		int iterations = (int)(powerUsed / Reconstructor.energyPerPoint);
@@ -98,7 +99,7 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 	
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return worldObj.getBlockTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
+		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -127,12 +128,12 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 	}
 
 	@Override
-	public String getInvName() {
+	public String getInventoryName() {
 		return "Reconstructor";
 	}
 
 	@Override
-	public boolean isInvNameLocalized() {
+	public boolean hasCustomInventoryName() {
 		return false;
 	}
 
@@ -142,11 +143,11 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 	}
 
 	@Override
-	public void openChest() {
+	public void openInventory() {
 	}
 
 	@Override
-	public void closeChest() {
+	public void closeInventory() {
 	}
 
 	@Override

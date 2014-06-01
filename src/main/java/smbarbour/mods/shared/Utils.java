@@ -10,7 +10,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import smbarbour.mods.shared.InventoryIterator.IInvSlot;
 
 import java.util.*;
@@ -40,7 +40,7 @@ public class Utils {
 		for (ForgeDirection direction : directions) {
 			Position pos = new Position(x, y, z, direction);
 			pos.moveForwards(1.0);
-			TileEntity tileOnSide = world.getBlockTileEntity((int)pos.x, (int)pos.y, (int)pos.z);
+			TileEntity tileOnSide = world.getTileEntity((int)pos.x, (int)pos.y, (int)pos.z);
 			if (tileOnSide instanceof ISidedInventory || tileOnSide instanceof IInventory) {
 				if (add((IInventory) tileOnSide, stack, direction.getOpposite(), true).stackSize > 0) {
 					return add((IInventory) tileOnSide, stack, direction.getOpposite(), false).stackSize;
@@ -73,7 +73,7 @@ public class Utils {
 		injected = tryPut(inventory, stack, filledSlots, injected, simulate);
 		injected = tryPut(inventory, stack, emptySlots, injected, simulate);
 
-		inventory.onInventoryChanged();
+		inventory.markDirty();
 		return injected;
 	}
 

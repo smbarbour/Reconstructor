@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 
 import java.util.LinkedList;
 
@@ -37,7 +38,7 @@ public class BasicInventory implements IInventory
 		if (slot < contents.length && contents[slot] != null) {
 			if (contents[slot].stackSize > num) {
 				ItemStack output = contents[slot].splitStack(num);
-				onInventoryChanged();
+				markDirty();
 				return output;
 			}
 			ItemStack output = contents[slot];
@@ -67,16 +68,16 @@ public class BasicInventory implements IInventory
 		if (newStack != null && newStack.stackSize > this.getInventoryStackLimit()) {
 			newStack.stackSize = this.getInventoryStackLimit();
 		}
-		onInventoryChanged();
+		markDirty();
 	}
 
 	@Override
-	public String getInvName() {
+	public String getInventoryName() {
 		return this.name;
 	}
 
 	@Override
-	public boolean isInvNameLocalized() {
+	public boolean hasCustomInventoryName() {
 		return false;
 	}
 
@@ -86,9 +87,9 @@ public class BasicInventory implements IInventory
 	}
 
 	@Override
-	public void onInventoryChanged() {
+	public void markDirty() {
 		for (TileEntity handler : this.listeners) {
-			handler.onInventoryChanged();
+			handler.markDirty();
 		}
 	}
 
@@ -98,10 +99,10 @@ public class BasicInventory implements IInventory
 	}
 
 	@Override
-	public void openChest() {}
+	public void openInventory() {}
 
 	@Override
-	public void closeChest() {}
+	public void closeInventory() {}
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemStack) {
@@ -122,10 +123,10 @@ public class BasicInventory implements IInventory
 	}
 
 	public void readFromNBT(NBTTagCompound data) {
-		NBTTagList slots = data.getTagList("items");
+		NBTTagList slots = data.getTagList("items", Constants.NBT.TAG_COMPOUND);
 
 		for (int j = 0; j < slots.tagCount(); ++j) {
-			NBTTagCompound slot = (NBTTagCompound) slots.tagAt(j);
+			NBTTagCompound slot = slots.getCompoundTagAt(j);
 			int index;
 			if (slot.hasKey("index")) {
 				index = slot.getInteger("index");
