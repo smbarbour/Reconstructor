@@ -18,7 +18,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-@Mod(modid = "Reconstructor", name="Reconstructor", version="1.3", acceptedMinecraftVersions="[1.6,1.7],")
+@Mod(modid = "Reconstructor", name="Reconstructor", version="1.4", acceptedMinecraftVersions="[1.6,1.7],")
 @NetworkMod(clientSideRequired = true, serverSideRequired = true)
 public class Reconstructor {
 	public static Configuration config;
