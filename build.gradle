@@ -19,12 +19,12 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.5"
+version = "2.0"
 group= "smbarbour.mods.Reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Reconstructor"
 
 minecraft {
-	version = "1.7.2-10.12.1.1103"
+	version = "1.7.10-10.13.1.1217"
 }
 
 processResources
