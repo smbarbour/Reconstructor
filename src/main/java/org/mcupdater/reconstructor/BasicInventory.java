@@ -1,4 +1,4 @@
-package smbarbour.mods.shared;
+package org.mcupdater.reconstructor;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

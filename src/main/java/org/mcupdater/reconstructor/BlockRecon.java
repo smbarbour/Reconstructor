@@ -1,24 +1,26 @@
-package smbarbour.mods;
+package org.mcupdater.reconstructor;
 
-import buildcraft.api.core.Position;
+import cofh.api.block.IDismantleable;
+import cofh.lib.util.helpers.BlockHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import smbarbour.mods.shared.BCInteract;
-import smbarbour.mods.shared.Utils;
 
-public class BlockRecon extends BlockContainer {
+import java.util.ArrayList;
 
-	IIcon textureTop;
+public class BlockRecon extends BlockContainer implements IDismantleable
+{
 	IIcon textureFront;
 	IIcon textureSide;
 	
@@ -28,6 +30,7 @@ public class BlockRecon extends BlockContainer {
 		setResistance(10F);
 		setStepSound(soundTypeMetal);
 		setBlockName("reconstructorBlock");
+		setCreativeTab(CreativeTabs.tabRedstone);
 	}
 
 	@Override
@@ -48,12 +51,7 @@ public class BlockRecon extends BlockContainer {
 		if (i == j && i>1) // Front can't be top or bottom.
 			return textureFront;
 
-		switch (i) {
-		case 1:
-			return textureTop;
-		default:
-			return textureSide;
-		}
+		return textureSide;
 	}
 
 	@Override
@@ -65,9 +63,8 @@ public class BlockRecon extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister iconRegistry)
 	{
-	    textureFront = iconRegistry.registerIcon("reconstructor:reconstructor_front");
-        textureSide = iconRegistry.registerIcon("reconstructor:reconstructor_side");
-        textureTop = iconRegistry.registerIcon("reconstructor:reconstructor_top");
+	    textureFront = iconRegistry.registerIcon("reconstructor:framed_iron_hammer");
+        textureSide = iconRegistry.registerIcon("reconstructor:framed_iron");
 	}
 	
 	@Override
@@ -77,12 +74,6 @@ public class BlockRecon extends BlockContainer {
 		if (player.isSneaking())
 			return false;
 		
-		if (Reconstructor.instance.doPipeInteract) {
-			if (BCInteract.isHoldingPipe(player)) {
-				return false;
-			}
-		}
-		
 		if (tile != null) {
 			return tile.onBlockActivated(player, ForgeDirection.getOrientation(side));
 		}
@@ -90,4 +81,34 @@ public class BlockRecon extends BlockContainer {
 		return false;
 	}
 
+	@Override
+	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
+		int meta = world.getBlockMetadata(x,y,z);
+		int newMeta = BlockHelper.getLeftSide(meta);
+		world.setBlockMetadataWithNotify(x,y,z,newMeta,3);
+		return true;
+	}
+
+	@Override
+	public ArrayList<ItemStack> dismantleBlock(EntityPlayer entityPlayer, World world, int x, int y, int z, boolean placeInInventory) {
+		ArrayList<ItemStack> dropped = new ArrayList<ItemStack>();
+		dropped.add(new ItemStack(Reconstructor.reconBlock));
+		world.setBlockToAir(x,y,z);
+
+		//Spawn in world
+		float multiplier = 0.3F;
+		double deltaX = world.rand.nextFloat() * multiplier + (1.0F - multiplier) * 0.5D;
+		double deltaY = world.rand.nextFloat() * multiplier + (1.0F - multiplier) * 0.5D;
+		double deltaZ = world.rand.nextFloat() * multiplier + (1.0F - multiplier) * 0.5D;
+		EntityItem spawnedItem = new EntityItem(world, x+deltaX, y+deltaY, z+ deltaZ, dropped.get(0));
+		spawnedItem.delayBeforeCanPickup = 10;
+		world.spawnEntityInWorld(spawnedItem);
+
+		return dropped;
+	}
+
+	@Override
+	public boolean canDismantle(EntityPlayer entityPlayer, World world, int i, int i2, int i3) {
+		return true;
+	}
 }

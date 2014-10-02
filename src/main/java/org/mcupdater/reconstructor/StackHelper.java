@@ -7,7 +7,7 @@
  *
  * This code is directly from Buildcraft, only the package name has been modified.
  */
-package smbarbour.mods.shared;
+package org.mcupdater.reconstructor;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;

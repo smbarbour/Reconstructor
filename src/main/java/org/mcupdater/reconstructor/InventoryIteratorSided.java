@@ -1,41 +1,46 @@
-package smbarbour.mods.shared;
+package org.mcupdater.reconstructor;
 
-import net.minecraft.inventory.IInventory;
+import org.mcupdater.reconstructor.InventoryIterator.IInvSlot;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import smbarbour.mods.shared.InventoryIterator.IInvSlot;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.Iterator;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>
  */
-class InventoryIteratorSimple implements Iterable<IInvSlot> {
+class InventoryIteratorSided implements Iterable<IInvSlot> {
 
-	private final IInventory inv;
+	private final ISidedInventory inv;
+	private final int side;
 
-	InventoryIteratorSimple(IInventory inv) {
+	InventoryIteratorSided(ISidedInventory inv, ForgeDirection side) {
 		this.inv = inv;
+		this.side = side.ordinal();
 	}
 
 	@Override
-	public Iterator<IInvSlot> iterator() {
+	public Iterator<InventoryIterator.IInvSlot> iterator() {
 		return new Iterator<IInvSlot>() {
-			int slot = 0;
+			int[] slots = inv.getAccessibleSlotsFromSide(side);
+			int index = 0;
 
 			@Override
 			public boolean hasNext() {
-				return slot < inv.getSizeInventory();
+				return index < slots.length;
 			}
 
 			@Override
 			public IInvSlot next() {
-				return new InvSlot(slot++);
+				return new InvSlot(slots[index++]);
 			}
 
 			@Override
 			public void remove() {
 				throw new UnsupportedOperationException("Remove not supported.");
 			}
+
 		};
 	}
 
@@ -59,12 +64,12 @@ class InventoryIteratorSimple implements Iterable<IInvSlot> {
 
 		@Override
 		public boolean canPutStackInSlot(ItemStack stack) {
-			return inv.isItemValidForSlot(slot, stack);
+			return inv.canInsertItem(slot, stack, side);
 		}
 
 		@Override
 		public boolean canTakeStackFromSlot(ItemStack stack) {
-			return true;
+			return inv.canExtractItem(slot, stack, side);
 		}
 
 		@Override
@@ -76,5 +81,6 @@ class InventoryIteratorSimple implements Iterable<IInvSlot> {
 		public int getIndex() {
 			return slot;
 		}
+
 	}
 }

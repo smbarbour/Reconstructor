@@ -1,46 +1,41 @@
-package smbarbour.mods.shared;
+package org.mcupdater.reconstructor;
 
-import smbarbour.mods.shared.InventoryIterator.IInvSlot;
-import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.util.ForgeDirection;
+import org.mcupdater.reconstructor.InventoryIterator.IInvSlot;
 
 import java.util.Iterator;
 
 /**
  * @author CovertJaguar <http://www.railcraft.info>
  */
-class InventoryIteratorSided implements Iterable<IInvSlot> {
+class InventoryIteratorSimple implements Iterable<IInvSlot> {
 
-	private final ISidedInventory inv;
-	private final int side;
+	private final IInventory inv;
 
-	InventoryIteratorSided(ISidedInventory inv, ForgeDirection side) {
+	InventoryIteratorSimple(IInventory inv) {
 		this.inv = inv;
-		this.side = side.ordinal();
 	}
 
 	@Override
-	public Iterator<InventoryIterator.IInvSlot> iterator() {
+	public Iterator<IInvSlot> iterator() {
 		return new Iterator<IInvSlot>() {
-			int[] slots = inv.getAccessibleSlotsFromSide(side);
-			int index = 0;
+			int slot = 0;
 
 			@Override
 			public boolean hasNext() {
-				return index < slots.length;
+				return slot < inv.getSizeInventory();
 			}
 
 			@Override
 			public IInvSlot next() {
-				return new InvSlot(slots[index++]);
+				return new InvSlot(slot++);
 			}
 
 			@Override
 			public void remove() {
 				throw new UnsupportedOperationException("Remove not supported.");
 			}
-
 		};
 	}
 
@@ -64,12 +59,12 @@ class InventoryIteratorSided implements Iterable<IInvSlot> {
 
 		@Override
 		public boolean canPutStackInSlot(ItemStack stack) {
-			return inv.canInsertItem(slot, stack, side);
+			return inv.isItemValidForSlot(slot, stack);
 		}
 
 		@Override
 		public boolean canTakeStackFromSlot(ItemStack stack) {
-			return inv.canExtractItem(slot, stack, side);
+			return true;
 		}
 
 		@Override
@@ -81,6 +76,5 @@ class InventoryIteratorSided implements Iterable<IInvSlot> {
 		public int getIndex() {
 			return slot;
 		}
-
 	}
 }

@@ -20,26 +20,32 @@ buildscript {
 apply plugin: 'forge'
 
 version = "2.0"
-group= "smbarbour.mods.Reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "org.mcupdater.reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Reconstructor"
 
 minecraft {
 	version = "1.7.10-10.13.1.1217"
 }
 
+dependencies {
+    compile files("lib/CoFHCore-[1.7.10]3.0.0B6-dev-32.jar")
+    compile files("lib/ThermalFoundation-[1.7.10]1.0.0B3-dev-8.jar")
+    compile files("lib/ThermalExpansion-[1.7.10]4.0.0B5-dev-13.jar")
+}
+
 processResources
 {
 	// this will ensure that this task is redone when the versions change.
 	inputs.property "version", project.version
-		inputs.property "mcversion", project.minecraft.version
+	inputs.property "mcversion", project.minecraft.version
 
-		// replace stuff in mcmod.info, nothing else
-		from(sourceSets.main.resources.srcDirs) {
-			include 'mcmod.info'
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
 
-				// replace version and mcversion
-				filter(ReplaceTokens, tokens: [version: project.version, mcversion: project.minecraft.version])
-		}
+    	// replace version and mcversion
+		filter(ReplaceTokens, tokens: [version: project.version, mcversion: project.minecraft.version])
+	}
 
 	// copy everything else, thats not the mcmod.info
 	from(sourceSets.main.resources.srcDirs) {

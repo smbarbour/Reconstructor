@@ -1,4 +1,4 @@
-package smbarbour.mods;
+package org.mcupdater.reconstructor;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;

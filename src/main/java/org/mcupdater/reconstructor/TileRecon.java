@@ -1,83 +1,46 @@
-package smbarbour.mods;
+package org.mcupdater.reconstructor;
 
-import buildcraft.api.power.IPowerReceptor;
-import buildcraft.api.power.PowerHandler;
-import buildcraft.api.power.PowerHandler.PowerReceiver;
+import cofh.api.energy.TileEnergyHandler;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import smbarbour.mods.shared.BCInteract;
-import smbarbour.mods.shared.BasicInventory;
-import smbarbour.mods.shared.Utils;
 
-public class TileRecon extends TileEntity implements IPowerReceptor, IInventory {
-	public PowerHandler powerHandler;
+public class TileRecon extends TileEnergyHandler implements ISidedInventory
+{
 	private final BasicInventory inv;
 	public static final int MAX_ENERGY = 1500;
 
 	public TileRecon(){
-		powerHandler = new PowerHandler(this, PowerHandler.Type.MACHINE);
-		initPowerProvider();
-		
 		inv = new BasicInventory(1,"Processing",1);
-	}
-
-	private void initPowerProvider() {
-		powerHandler.configure((Reconstructor.energyPerPoint * 2), (Reconstructor.energyPerPoint * 20), Reconstructor.energyPerPoint, MAX_ENERGY);
-		powerHandler.configurePowerPerdition(1, 1);
-	}
-
-	@Override
-	public PowerReceiver getPowerReceiver(ForgeDirection side) {
-		return powerHandler.getPowerReceiver();
 	}
 
 	@Override
 	public void updateEntity() {
-		getPowerReceiver(null).update();
+		super.updateEntity();
+		if (storage.getEnergyStored() > Reconstructor.energyPerPoint) {
+			if (tryRepair()) {
+				storage.extractEnergy(Reconstructor.energyPerPoint, false);
+			}
+		}
 	}
 
-
-    @Override
-	public void doWork(PowerHandler workProvider) {
+	public boolean tryRepair() {
 		if (getStackInSlot(0) == null)
-			return;
+			return false;
 			
 		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
 			ejectItem();
-			return;
+			return false;
 		}
-		double powerUsed = powerHandler.useEnergy(Reconstructor.energyPerPoint, (Reconstructor.energyPerPoint * 10), true);
-		if (powerUsed < (double) Reconstructor.energyPerPoint){
-			return;		
-		}
-		int iterations = (int)(powerUsed / Reconstructor.energyPerPoint);
-		int iteration = 0;
-		while (getStackInSlot(0).isItemDamaged() && iteration < iterations) {
-			getStackInSlot(0).damageItem(-1, new GremlinEntity(this.worldObj));
-			iteration++;
-		}
-	}
-
-	@Override
-	public World getWorld() {
-		return worldObj;
+		getStackInSlot(0).damageItem(-1, new GremlinEntity(this.worldObj));
+		return true;
 	}
 
 	private void ejectItem() {
-		if (Reconstructor.instance.doPipeInteract) {
-			if (BCInteract.addToPipe(worldObj, xCoord, yCoord, zCoord, ForgeDirection.UNKNOWN, getStackInSlot(0)) > 0) {
-				decrStackSize(0, 1);
-				return;
-			}
-		}
-
-		if (Utils.addToRandomInventory(worldObj, xCoord, yCoord, zCoord, getStackInSlot(0)) > 0) {
+		if (Utils.addToPriorityInventory(worldObj, xCoord, yCoord, zCoord, getStackInSlot(0)) > 0) {
 			decrStackSize(0, 1);
 			return;
 		}
@@ -172,5 +135,20 @@ public class TileRecon extends TileEntity implements IPowerReceptor, IInventory 
 	public void writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
 		inv.writeToNBT(data);
+	}
+
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		return new int[]{0};
+	}
+
+	@Override
+	public boolean canInsertItem(int slot, ItemStack item, int side) {
+		return true;
+	}
+
+	@Override
+	public boolean canExtractItem(int slot, ItemStack item, int side) {
+		return false;
 	}
 }

@@ -1,4 +1,4 @@
-package smbarbour.mods;
+package org.mcupdater.reconstructor;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

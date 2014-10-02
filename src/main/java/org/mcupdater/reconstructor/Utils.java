@@ -1,17 +1,17 @@
-package smbarbour.mods.shared;
+package org.mcupdater.reconstructor;
 
 /*
  * This code is derived from the Buildcraft class of the same name as it appeared in Buildcraft 4.2.2
  */
 
-import buildcraft.api.core.Position;
+import cofh.lib.util.helpers.BlockHelper;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import smbarbour.mods.shared.InventoryIterator.IInvSlot;
+import org.mcupdater.reconstructor.InventoryIterator.IInvSlot;
 
 import java.util.*;
 
@@ -35,15 +35,15 @@ public class Utils {
 		}
 	}
 
-	public static int addToRandomInventory(World world, int x, int y, int z, ItemStack stack) {
-		Collections.shuffle(directions);
-		for (ForgeDirection direction : directions) {
-			Position pos = new Position(x, y, z, direction);
-			pos.moveForwards(1.0);
-			TileEntity tileOnSide = world.getTileEntity((int)pos.x, (int)pos.y, (int)pos.z);
-			if (tileOnSide instanceof ISidedInventory || tileOnSide instanceof IInventory) {
-				if (add((IInventory) tileOnSide, stack, direction.getOpposite(), true).stackSize > 0) {
-					return add((IInventory) tileOnSide, stack, direction.getOpposite(), false).stackSize;
+	public static int addToPriorityInventory(World world, int x, int y, int z, ItemStack stack) {
+		int meta = world.getBlockMetadata(x,y,z);
+		List<Integer> sides = new ArrayList<Integer>(Arrays.asList(BlockHelper.getBelowSide(meta),BlockHelper.getRightSide(meta),BlockHelper.getOppositeSide(meta),BlockHelper.getLeftSide(meta),BlockHelper.getAboveSide(meta)));
+		for (Integer side : sides) {
+			TileEntity target;
+			target = BlockHelper.getAdjacentTileEntity(world, x, y, z, side.intValue());
+			if (target instanceof ISidedInventory || target instanceof IInventory) {
+				if (add((IInventory) target, stack, ForgeDirection.values()[BlockHelper.getOppositeSide(side)], true).stackSize > 0) {
+					return add((IInventory) target, stack, ForgeDirection.values()[BlockHelper.getOppositeSide(side)], false).stackSize;
 				}
 			}
 		}
