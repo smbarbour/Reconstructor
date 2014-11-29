@@ -11,7 +11,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 public class TileRecon extends TileEnergyHandler implements ISidedInventory
 {
 	private final BasicInventory inv;
-	public static final int MAX_ENERGY = 1500;
 
 	public TileRecon(){
 		inv = new BasicInventory(1,"Processing",1);
