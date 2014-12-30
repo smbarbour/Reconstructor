@@ -30,7 +30,7 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 		if (getStackInSlot(0) == null)
 			return false;
 			
-		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
+		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
 			ejectItem();
 			return false;
 		}
