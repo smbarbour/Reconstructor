@@ -30,6 +30,7 @@ public class AddBlacklistCommand extends CommandBase
 		}
 		Reconstructor.blacklist.add(player.getCurrentEquippedItem().getUnlocalizedName());
 		Reconstructor.blProperty.set(Reconstructor.blacklist.toArray(new String[Reconstructor.blacklist.size()]));
+		Reconstructor.config.save();
 	}
 
 }
