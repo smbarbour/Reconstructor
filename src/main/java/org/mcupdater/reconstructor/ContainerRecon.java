@@ -1,19 +1,47 @@
 package org.mcupdater.reconstructor;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 
 public class ContainerRecon extends Container {
 
 	private TileRecon tile;
 
-	public ContainerRecon(InventoryPlayer inventoryplayer, TileRecon t) {
+	public ContainerRecon(final InventoryPlayer inventoryplayer, TileRecon t) {
 		this.tile = t;
 		addSlotToContainer(new Slot(t, 0, 80, 41));
-		
+
+        for (int i = 0; i < 4; ++i)
+        {
+            final int k = i;
+            this.addSlotToContainer(new Slot(inventoryplayer, inventoryplayer.getSizeInventory() - 1 - i, 8, 8 + i * 18)
+            {
+                public int getSlotStackLimit()
+                {
+                    return 1;
+                }
+
+                public boolean isItemValid(ItemStack itemStack)
+                {
+                    if (itemStack == null) return false;
+                    return itemStack.getItem().isValidArmor(itemStack, k, inventoryplayer.player);
+                }
+
+                @SideOnly(Side.CLIENT)
+                public IIcon getBackgroundIconIndex()
+                {
+                    return ItemArmor.func_94602_b(k);
+                }
+            });
+        }
+
 		for (int i = 0; i < 3; i++) {
 			for (int k = 0; k < 9; k++) {
 				addSlotToContainer(new Slot(inventoryplayer, k + i * 9 + 9, 8 + k * 18, 84 + i * 18));

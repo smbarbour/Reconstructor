@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mod(modid = "Reconstructor", name="Reconstructor", version="2.0", dependencies = "required-after:CoFHCore")
+@Mod(modid = "Reconstructor", name="Reconstructor", version="2.3", dependencies = "required-after:CoFHCore")
 public class Reconstructor {
 	public static Configuration config;
 	public static BlockRecon reconBlock;
@@ -64,6 +64,10 @@ public class Reconstructor {
 	}
 	
 	private void loadRecipes() {
+        ItemStack keyItem = GameRegistry.findItemStack("ThermalExpansion","powerCoilGold",1);
+        if (keyItem == null) {
+            keyItem = new ItemStack(Items.redstone);
+        }
 		ShapedOreRecipe gearRecipe = new ShapedOreRecipe(
 				new ItemStack(reconBlock, 1), // output
 				"iii", // (
@@ -72,7 +76,7 @@ public class Reconstructor {
 				'i', Items.iron_ingot,
 				'a', Blocks.anvil,
 				'g', recipeItem,
-				'c', Items.redstone
+				'c', keyItem
 		);
 		GameRegistry.addRecipe(gearRecipe);
 	}
