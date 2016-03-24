@@ -19,7 +19,7 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "2.3"
+version = "2.4"
 group= "org.mcupdater.reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Reconstructor"
 
@@ -28,7 +28,7 @@ minecraft {
 }
 
 dependencies {
-    compile files("lib/CoFHCore-[1.7.10]3.0.0RC7-211-dev.jar")
+    compile files("lib/CoFHLib-[1.7.10]1.0.3-175-dev.jar")
     // compile files("lib/ThermalFoundation-[1.7.10]1.0.0B3-dev-8.jar")
     // compile files("lib/ThermalExpansion-[1.7.10]4.0.0B5-dev-13.jar")
 }

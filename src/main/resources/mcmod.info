@@ -2,7 +2,7 @@
 {
   "modid": "Reconstructor",
   "name": "Reconstructor",
-  "description": "Repair your stuff using Buildcraft power",
+  "description": "Repair your stuff using RF",
   "version": "@version@",
   "mcversion": "@mcversion@",
   "url": "",

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mod(modid = "Reconstructor", name="Reconstructor", version="2.3", dependencies = "required-after:CoFHCore")
+@Mod(modid = "Reconstructor", useMetadata = true)
 public class Reconstructor {
 	public static Configuration config;
 	public static BlockRecon reconBlock;
