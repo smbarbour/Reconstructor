@@ -12,7 +12,8 @@
   "logoFile": "",
   "screenshots": [],
   "parent":"",
-  "dependencies": [
-  ]
+  "requiredMods": ["CoFHAPI", "CoFHLib"],
+  "dependencies": ["CoFHAPI", "CoFHLib"],
+  "useDependencyInformation": true
 }
 ]
