@@ -1,20 +1,23 @@
 package org.mcupdater.reconstructor;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import org.mcupdater.reconstructor.proxy.CommonProxy;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,18 +25,22 @@ import java.util.Set;
 
 @Mod(modid = "Reconstructor", useMetadata = true)
 public class Reconstructor {
+
+	@SidedProxy(clientSide = "org.mcupdater.reconstructor.proxy.ClientProxy", serverSide = "org.mcupdater.reconstructor.proxy.CommonProxy")
+	public static CommonProxy proxy;
+
 	public static Configuration config;
 	public static BlockRecon reconBlock;
 	public static int energyPerPoint;
 	public boolean restrictRepairs;
-	@Instance("Reconstructor")
+	@Mod.Instance("Reconstructor")
 	public static Reconstructor instance;
 	private String recipeItem;
 	public static Set<String> blacklist;
 	public static Property blProperty;
 
-	@EventHandler
-    public void initialize(FMLPreInitializationEvent evt) {
+	@Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent evt) {
         config = new Configuration(evt.getSuggestedConfigurationFile());
         config.load();
         energyPerPoint = config.get("General", "RF_per_damage_point", 50).getInt(50);
@@ -51,32 +58,39 @@ public class Reconstructor {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-	@EventHandler
-	public void load(FMLInitializationEvent evt) {
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent evt) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ReconGuiHandler());
 		GameRegistry.registerTileEntity(TileRecon.class, "Reconstructor");
-		loadRecipes();
 	}
 
-	@EventHandler
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent evt) {
+		loadRecipes();
+		if (proxy.isClient()) {
+			proxy.doClientRegistrations();
+		}
+	}
+	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent e){
 		e.registerServerCommand(new AddBlacklistCommand());
 	}
 	
 	private void loadRecipes() {
-        ItemStack keyItem = GameRegistry.findItemStack("ThermalExpansion","powerCoilGold",1);
+        Item keyItem = Item.REGISTRY.getObject(new ResourceLocation("ThermalExpansion","powerCoilGold"));
         if (keyItem == null) {
-            keyItem = new ItemStack(Items.redstone);
+            keyItem = Items.REDSTONE;
         }
+		ItemStack keyStack = new ItemStack(keyItem,1);
 		ShapedOreRecipe gearRecipe = new ShapedOreRecipe(
 				new ItemStack(reconBlock, 1), // output
 				"iii", // (
 				"iai", // Shaped pattern
 				"gcg", // )
-				'i', Items.iron_ingot,
-				'a', Blocks.anvil,
+				'i', Items.IRON_INGOT,
+				'a', Blocks.ANVIL,
 				'g', recipeItem,
-				'c', keyItem
+				'c', keyStack
 		);
 		GameRegistry.addRecipe(gearRecipe);
 	}

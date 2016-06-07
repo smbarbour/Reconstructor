@@ -1,18 +1,18 @@
 package org.mcupdater.reconstructor;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
+import org.mcupdater.reconstructor.helpers.StackHelper;
 
 public class ContainerRecon extends Container {
 
 	private TileRecon tile;
+	private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
 
 	public ContainerRecon(final InventoryPlayer inventoryplayer, TileRecon t) {
 		this.tile = t;
@@ -20,8 +20,8 @@ public class ContainerRecon extends Container {
 
         for (int i = 0; i < 4; ++i)
         {
-            final int k = i;
-            this.addSlotToContainer(new Slot(inventoryplayer, inventoryplayer.getSizeInventory() - 1 - i, 8, 8 + i * 18)
+	        final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[i];
+            this.addSlotToContainer(new Slot(inventoryplayer, 36 + (3 - i), 8, 8 + i * 18)
             {
                 public int getSlotStackLimit()
                 {
@@ -31,14 +31,13 @@ public class ContainerRecon extends Container {
                 public boolean isItemValid(ItemStack itemStack)
                 {
                     if (itemStack == null) return false;
-                    return itemStack.getItem().isValidArmor(itemStack, k, inventoryplayer.player);
+                    return itemStack.getItem().isValidArmor(itemStack, entityequipmentslot, inventoryplayer.player);
                 }
 
-                @SideOnly(Side.CLIENT)
-                public IIcon getBackgroundIconIndex()
-                {
-                    return ItemArmor.func_94602_b(k);
-                }
+	            public String getSlotTexture()
+	            {
+		            return ItemArmor.EMPTY_SLOT_NAMES[entityequipmentslot.getIndex()];
+	            }
             });
         }
 
@@ -56,11 +55,6 @@ public class ContainerRecon extends Container {
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
 		return tile.isUseableByPlayer(entityplayer);
-	}
-
-	@Override
-	public ItemStack slotClick(int slot, int button, int modifier, EntityPlayer player) {
-		return super.slotClick(slot, button, modifier, player);
 	}
 
 	@Override

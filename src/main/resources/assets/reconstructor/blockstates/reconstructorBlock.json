@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "reconstructor:reconstructorBlock" },
+    "facing=south": { "model": "reconstructor:reconstructorBlock", "y": 180 },
+    "facing=west":  { "model": "reconstructor:reconstructorBlock", "y": 270 },
+    "facing=east":  { "model": "reconstructor:reconstructorBlock", "y": 90 }
+  }
+}

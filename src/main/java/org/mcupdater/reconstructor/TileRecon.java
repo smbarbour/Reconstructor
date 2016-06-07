@@ -6,19 +6,23 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.text.ITextComponent;
 
-public class TileRecon extends TileEnergyHandler implements ISidedInventory
+import javax.annotation.Nullable;
+
+public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInventory
 {
 	private final BasicInventory inv;
+	private EnumFacing orientation = EnumFacing.DOWN;
 
 	public TileRecon(){
 		inv = new BasicInventory(1,"Processing",1);
 	}
 
 	@Override
-	public void updateEntity() {
-		super.updateEntity();
+	public void update() {
 		if (storage.getEnergyStored() > Reconstructor.energyPerPoint) {
 			if (tryRepair()) {
 				storage.extractEnergy(Reconstructor.energyPerPoint, false);
@@ -39,7 +43,7 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 	}
 
 	private void ejectItem() {
-		if (Utils.addToPriorityInventory(worldObj, xCoord, yCoord, zCoord, getStackInSlot(0)) > 0) {
+		if (Utils.addToPriorityInventory(worldObj, this.pos, getStackInSlot(0))) {
 			decrStackSize(0, 1);
 			return;
 		}
@@ -48,7 +52,7 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 		float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
 		float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
 
-		EntityItem entityitem = new EntityItem(this.worldObj, xCoord + f, yCoord + f1 + 0.5F, zCoord + f2, getStackInSlot(0));
+		EntityItem entityitem = new EntityItem(this.worldObj, this.pos.getX() + f, this.pos.getY() + f1 + 0.5F, this.pos.getZ() + f2, getStackInSlot(0));
 
 		float f3 = 0.05F;
 		entityitem.motionX = (float) this.worldObj.rand.nextGaussian() * f3;
@@ -61,7 +65,17 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 	
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64.0D;
+		return true;
+	}
+
+	@Override
+	public void openInventory(EntityPlayer player) {
+
+	}
+
+	@Override
+	public void closeInventory(EntityPlayer player) {
+
 	}
 
 	@Override
@@ -79,9 +93,10 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 		return inv.decrStackSize(slot, amount);
 	}
 
+	@Nullable
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot) {
-		return inv.getStackInSlotOnClosing(slot);
+	public ItemStack removeStackFromSlot(int index) {
+		return null;
 	}
 
 	@Override
@@ -90,26 +105,8 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 	}
 
 	@Override
-	public String getInventoryName() {
-		return "Reconstructor";
-	}
-
-	@Override
-	public boolean hasCustomInventoryName() {
-		return false;
-	}
-
-	@Override
 	public int getInventoryStackLimit() {
 		return 1;
-	}
-
-	@Override
-	public void openInventory() {
-	}
-
-	@Override
-	public void closeInventory() {
 	}
 
 	@Override
@@ -117,13 +114,26 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 		return itemstack.getItem().isDamageable();
 	}
 
-	public boolean onBlockActivated(EntityPlayer player, ForgeDirection orientation) {
-		if (!worldObj.isRemote) {
-			player.openGui(Reconstructor.instance, 0, worldObj, xCoord, yCoord, zCoord);
-		}
-		return true;
+	@Override
+	public int getField(int id) {
+		return 0;
 	}
-	
+
+	@Override
+	public void setField(int id, int value) {
+
+	}
+
+	@Override
+	public int getFieldCount() {
+		return 0;
+	}
+
+	@Override
+	public void clear() {
+
+	}
+
 	@Override
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
@@ -131,23 +141,47 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound data) {
+	public NBTTagCompound writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
 		inv.writeToNBT(data);
+		return data;
 	}
 
 	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[]{0};
+	public int[] getSlotsForFace(EnumFacing side) {
+		return new int[0];
 	}
 
 	@Override
-	public boolean canInsertItem(int slot, ItemStack item, int side) {
+	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
 		return true;
 	}
 
 	@Override
-	public boolean canExtractItem(int slot, ItemStack item, int side) {
+	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
 		return false;
+	}
+
+	@Override
+	public String getName() {
+		return "Reconstructor";
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return false;
+	}
+
+	@Override
+	public ITextComponent getDisplayName() {
+		return null;
+	}
+
+	public EnumFacing getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(EnumFacing orientation) {
+		this.orientation = orientation;
 	}
 }

@@ -7,10 +7,9 @@
  *
  * This code is directly from Buildcraft, the package name has been modified and unused functions removed.
  */
-package org.mcupdater.reconstructor;
+package org.mcupdater.reconstructor.helpers;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class StackHelper {
 

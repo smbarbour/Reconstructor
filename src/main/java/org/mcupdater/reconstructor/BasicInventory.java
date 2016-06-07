@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.LinkedList;
@@ -49,7 +50,7 @@ public class BasicInventory implements IInventory
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot) {
+	public ItemStack removeStackFromSlot(int slot) {
 		if (this.contents[slot] == null) {
 			return null;
 		}
@@ -72,13 +73,18 @@ public class BasicInventory implements IInventory
 	}
 
 	@Override
-	public String getInventoryName() {
+	public String getName() {
 		return this.name;
 	}
 
 	@Override
-	public boolean hasCustomInventoryName() {
+	public boolean hasCustomName() {
 		return false;
+	}
+
+	@Override
+	public ITextComponent getDisplayName() {
+		return null;
 	}
 
 	@Override
@@ -99,14 +105,34 @@ public class BasicInventory implements IInventory
 	}
 
 	@Override
-	public void openInventory() {}
+	public void openInventory(EntityPlayer player) {}
 
 	@Override
-	public void closeInventory() {}
+	public void closeInventory(EntityPlayer player) {}
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemStack) {
 		return true;
+	}
+
+	@Override
+	public int getField(int id) {
+		return 0;
+	}
+
+	@Override
+	public void setField(int id, int value) {
+
+	}
+
+	@Override
+	public int getFieldCount() {
+		return 0;
+	}
+
+	@Override
+	public void clear() {
+
 	}
 
 	public void writeToNBT(NBTTagCompound tagCompound){
