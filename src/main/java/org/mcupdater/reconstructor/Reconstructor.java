@@ -9,6 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -32,6 +33,7 @@ public class Reconstructor {
 	public static Configuration config;
 	public static BlockRecon reconBlock;
 	public static int energyPerPoint;
+	public static ModMetadata metadata;
 	public boolean restrictRepairs;
 	@Mod.Instance("Reconstructor")
 	public static Reconstructor instance;
@@ -41,10 +43,11 @@ public class Reconstructor {
 
 	@Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
+		metadata = evt.getModMetadata();
         config = new Configuration(evt.getSuggestedConfigurationFile());
         config.load();
         energyPerPoint = config.get("General", "RF_per_damage_point", 50).getInt(50);
-		recipeItem = config.get("General", "Recipe_Item", "gearInvar", "Ore dictionary string of item to use in lower corners").getString();
+		recipeItem = config.get("General", "Recipe_Item", "minecraft:book", "Item ID or Ore dictionary string of item to use in lower corners").getString();
         restrictRepairs = config.get("General", "Restricted", false, "If true, will only repair things that extend the tool, armor, sword and bow classes.").getBoolean(false);
 		blProperty = config.get("General", "Blacklist", new String[0], "Item classes that appear in this list will not be repaired by the Reconstructor.");
 		blacklist = new HashSet<String>(Arrays.asList(blProperty.getStringList()));
@@ -53,7 +56,8 @@ public class Reconstructor {
         }
 
         reconBlock = new BlockRecon();
-        GameRegistry.registerBlock(reconBlock, ItemBlockReconstructor.class, reconBlock.getUnlocalizedName().replace("tile.", ""));
+        GameRegistry.register(reconBlock);
+		GameRegistry.register(reconBlock.getItemBlock());
 
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -89,7 +93,7 @@ public class Reconstructor {
 				"gcg", // )
 				'i', Items.IRON_INGOT,
 				'a', Blocks.ANVIL,
-				'g', recipeItem,
+				'g', (recipeItem.contains(":") ? Item.REGISTRY.getObject(new ResourceLocation(recipeItem)) : recipeItem),
 				'c', keyStack
 		);
 		GameRegistry.addRecipe(gearRecipe);

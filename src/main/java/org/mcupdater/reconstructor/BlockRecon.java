@@ -1,5 +1,6 @@
 package org.mcupdater.reconstructor;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -9,6 +10,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -25,14 +28,28 @@ public class BlockRecon extends BlockContainer
 		FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 	}
 
+	private Item itemBlock;
+
 	public BlockRecon() {
 		super(Material.IRON);
+		setUnlocalizedName("reconstructorBlock");
+		setRegistryName(Reconstructor.metadata.modId, "reconstructorBlock");
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		setHardness(10F);
 		setResistance(10F);
 		setSoundType(SoundType.METAL);
-		setUnlocalizedName("reconstructorBlock");
 		setCreativeTab(CreativeTabs.REDSTONE);
+
+		itemBlock = this.generateItemBlock();
+	}
+
+	private ItemBlock generateItemBlock() {
+		ItemBlock itemBlock = new ItemBlockReconstructor(this);
+		return itemBlock;
+	}
+
+	public Item getItemBlock() {
+		return this.itemBlock;
 	}
 
 	@Override
@@ -89,5 +106,14 @@ public class BlockRecon extends BlockContainer
 	@Override
 	public EnumBlockRenderType getRenderType(IBlockState state) {
 		return EnumBlockRenderType.MODEL;
+	}
+
+	private class ItemBlockReconstructor extends ItemBlock {
+
+		public ItemBlockReconstructor(Block block) {
+			super(block);
+			setUnlocalizedName("reconstructorBlock");
+			setRegistryName(Reconstructor.metadata.modId, "reconstructorBlock");
+		}
 	}
 }

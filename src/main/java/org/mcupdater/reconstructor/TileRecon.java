@@ -33,12 +33,21 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 	public boolean tryRepair() {
 		if (getStackInSlot(0) == null)
 			return false;
-			
-		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
+
+		if (!getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
 			ejectItem();
 			return false;
 		}
-		getStackInSlot(0).damageItem(-1, new GremlinEntity(this.worldObj));
+		getStackInSlot(0).setItemDamage(getStackInSlot(0).getItemDamage() - 1);
+		if (getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) {
+			NBTTagCompound tag = getStackInSlot(0).getTagCompound();
+			if (tag != null && tag.hasKey("Stats")) {
+				NBTTagCompound stats = tag.getCompoundTag("Stats");
+				stats.setBoolean("Broken",false);
+				tag.setTag("Stats", stats);
+				getStackInSlot(0).setTagCompound(tag);
+			}
+		}
 		return true;
 	}
 
