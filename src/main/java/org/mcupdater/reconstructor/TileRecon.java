@@ -1,21 +1,25 @@
 package org.mcupdater.reconstructor;
 
-import cofh.api.energy.TileEnergyHandler;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.EnergyStorage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInventory
+public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 {
 	private final BasicInventory inv;
 	private EnumFacing orientation = EnumFacing.DOWN;
+	private EnergyStorage storage = new EnergyStorage(Reconstructor.energyPerPoint * 1000);
 
 	public TileRecon(){
 		inv = new BasicInventory(1,"Processing",1);
@@ -57,6 +61,7 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 			return;
 		}
 		
+/*
 		float f = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
 		float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
 		float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
@@ -70,6 +75,7 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 		this.worldObj.spawnEntityInWorld(entityitem);
 		
 		decrStackSize(0, 1);
+*/
 	}
 	
 	@Override
@@ -147,18 +153,22 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
 		inv.readFromNBT(data);
+		if (data.hasKey("energy")) {
+			storage.receiveEnergy(data.getInteger("energy"),false);
+		}
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
 		inv.writeToNBT(data);
+		data.setInteger("energy", storage.getEnergyStored());
 		return data;
 	}
 
 	@Override
 	public int[] getSlotsForFace(EnumFacing side) {
-		return new int[0];
+		return new int[]{0};
 	}
 
 	@Override
@@ -168,7 +178,11 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 
 	@Override
 	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-		return false;
+		if (getStackInSlot(0) != null) {
+			return (!getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow)));
+		} else {
+			return false;
+		}
 	}
 
 	@Override
@@ -192,5 +206,19 @@ public class TileRecon extends TileEnergyHandler implements ITickable, ISidedInv
 
 	public void setOrientation(EnumFacing orientation) {
 		this.orientation = orientation;
+	}
+
+	@Override
+	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+		if (capability == CapabilityEnergy.ENERGY) {
+			return CapabilityEnergy.ENERGY.cast(storage);
+		}
+
+		return super.getCapability(capability, facing);
+	}
+
+	@Override
+	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
+		return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
 	}
 }

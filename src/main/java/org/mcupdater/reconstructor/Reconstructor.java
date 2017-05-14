@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mod(modid = "Reconstructor", useMetadata = true)
+@Mod(modid = "reconstructor", useMetadata = true)
 public class Reconstructor {
 
 	@SidedProxy(clientSide = "org.mcupdater.reconstructor.proxy.ClientProxy", serverSide = "org.mcupdater.reconstructor.proxy.CommonProxy")
@@ -35,7 +35,7 @@ public class Reconstructor {
 	public static int energyPerPoint;
 	public static ModMetadata metadata;
 	public boolean restrictRepairs;
-	@Mod.Instance("Reconstructor")
+	@Mod.Instance("reconstructor")
 	public static Reconstructor instance;
 	private String recipeItem;
 	public static Set<String> blacklist;
@@ -65,7 +65,7 @@ public class Reconstructor {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent evt) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new ReconGuiHandler());
-		GameRegistry.registerTileEntity(TileRecon.class, "Reconstructor");
+		GameRegistry.registerTileEntity(TileRecon.class, "reconstructor");
 	}
 
 	@Mod.EventHandler

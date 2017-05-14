@@ -1,6 +1,6 @@
 [
 {
-  "modid": "Reconstructor",
+  "modid": "reconstructor",
   "name": "Reconstructor",
   "description": "Repair your stuff using RF",
   "version": "@version@",
