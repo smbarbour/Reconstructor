@@ -32,8 +32,8 @@ public class BlockRecon extends BlockContainer
 
 	public BlockRecon() {
 		super(Material.IRON);
-		setUnlocalizedName("reconstructorBlock");
-		setRegistryName(Reconstructor.metadata.modId, "reconstructorBlock");
+		setUnlocalizedName("reconstructorblock");
+		setRegistryName(Reconstructor.metadata.modId, "reconstructorblock");
 		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		setHardness(10F);
 		setResistance(10F);
@@ -68,7 +68,7 @@ public class BlockRecon extends BlockContainer
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		TileRecon tile = (TileRecon) world.getTileEntity(pos);
 		
 		if (player.isSneaking())
@@ -112,8 +112,8 @@ public class BlockRecon extends BlockContainer
 
 		public ItemBlockReconstructor(Block block) {
 			super(block);
-			setUnlocalizedName("reconstructorBlock");
-			setRegistryName(Reconstructor.metadata.modId, "reconstructorBlock");
+			setUnlocalizedName("reconstructorblock");
+			setRegistryName(Reconstructor.metadata.modId, "reconstructorblock");
 		}
 	}
 }

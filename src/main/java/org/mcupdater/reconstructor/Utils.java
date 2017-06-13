@@ -16,10 +16,8 @@ import org.mcupdater.reconstructor.helpers.InventoryHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class Utils {
-	public static final Random rng = new Random();
 
 	public static boolean addToPriorityInventory(World world, BlockPos pos, ItemStack stack) {
 		List<BlockPos> sides = getSideList(pos, ((TileRecon)world.getTileEntity(pos)).getOrientation());
@@ -29,8 +27,11 @@ public class Utils {
 			if (target instanceof IInventory) {
 				InvWrapper invOutput = new InvWrapper((IInventory) target);
 				if (InventoryHelper.canStackFitInInventory(invOutput, stack)) {
-					InventoryHelper.insertItemStackIntoInventory(invOutput, stack);
-					return true;
+					ItemStack remain = InventoryHelper.insertItemStackIntoInventory(invOutput, stack);
+					if (remain.isEmpty()) {
+						return true;
+					}
+					return false;
 				}
 			}
 		}

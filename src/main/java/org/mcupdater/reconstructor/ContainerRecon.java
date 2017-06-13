@@ -30,7 +30,7 @@ public class ContainerRecon extends Container {
 
                 public boolean isItemValid(ItemStack itemStack)
                 {
-                    if (itemStack == null) return false;
+                    if (itemStack.isEmpty()) return false;
                     return itemStack.getItem().isValidArmor(itemStack, entityequipmentslot, inventoryplayer.player);
                 }
 
@@ -54,13 +54,13 @@ public class ContainerRecon extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer entityplayer) {
-		return tile.isUseableByPlayer(entityplayer);
+		return tile.isUsableByPlayer(entityplayer);
 	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-		ItemStack originalStack = null;
-		Slot slot = (Slot) inventorySlots.get(slotIndex);
+		ItemStack originalStack = ItemStack.EMPTY;
+		Slot slot = inventorySlots.get(slotIndex);
 		int numSlots = inventorySlots.size();
 		if (slot != null && slot.getHasStack()) {
 			ItemStack stackInSlot = slot.getStack();
@@ -69,25 +69,25 @@ public class ContainerRecon extends Container {
 // NOOP
 			} else if (slotIndex >= numSlots - 9 * 4 && slotIndex < numSlots - 9) {
 				if (!shiftItemStack(stackInSlot, numSlots - 9, numSlots)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			} else if (slotIndex >= numSlots - 9 && slotIndex < numSlots) {
 				if (!shiftItemStack(stackInSlot, numSlots - 9 * 4, numSlots - 9)) {
-					return null;
+					return ItemStack.EMPTY;
 				}
 			} else if (!shiftItemStack(stackInSlot, numSlots - 9 * 4, numSlots)) {
-				return null;
+				return ItemStack.EMPTY;
 			}
 			slot.onSlotChange(stackInSlot, originalStack);
-			if (stackInSlot.stackSize <= 0) {
-				slot.putStack(null);
+			if (stackInSlot.getCount() <= 0) {
+				slot.putStack(ItemStack.EMPTY);
 			} else {
 				slot.onSlotChanged();
 			}
-			if (stackInSlot.stackSize == originalStack.stackSize) {
-				return null;
+			if (stackInSlot.getCount() == originalStack.getCount()) {
+				return ItemStack.EMPTY;
 			}
-			slot.onPickupFromSlot(player, stackInSlot);
+			slot.onTake(player, stackInSlot);
 		}
 		return originalStack;
 	}
@@ -95,35 +95,35 @@ public class ContainerRecon extends Container {
 	protected boolean shiftItemStack(ItemStack stackToShift, int start, int end) {
 		boolean changed = false;
 		if (stackToShift.isStackable()) {
-			for (int slotIndex = start; stackToShift.stackSize > 0 && slotIndex < end; slotIndex++) {
-				Slot slot = (Slot) inventorySlots.get(slotIndex);
+			for (int slotIndex = start; stackToShift.getCount() > 0 && slotIndex < end; slotIndex++) {
+				Slot slot = inventorySlots.get(slotIndex);
 				ItemStack stackInSlot = slot.getStack();
-				if (stackInSlot != null && StackHelper.instance().canStacksMerge(stackInSlot, stackToShift)) {
-					int resultingStackSize = stackInSlot.stackSize + stackToShift.stackSize;
+				if (!stackInSlot.isEmpty() && StackHelper.instance().canStacksMerge(stackInSlot, stackToShift)) {
+					int resultingStackSize = stackInSlot.getCount() + stackToShift.getCount();
 					int max = Math.min(stackToShift.getMaxStackSize(), slot.getSlotStackLimit());
 					if (resultingStackSize <= max) {
-						stackToShift.stackSize = 0;
-						stackInSlot.stackSize = resultingStackSize;
+						stackToShift.setCount(0);
+						stackInSlot.setCount(resultingStackSize);
 						slot.onSlotChanged();
 						changed = true;
-					} else if (stackInSlot.stackSize < max) {
-						stackToShift.stackSize -= max - stackInSlot.stackSize;
-						stackInSlot.stackSize = max;
+					} else if (stackInSlot.getCount() < max) {
+						stackToShift.setCount(stackToShift.getCount() - max - stackInSlot.getCount());
+						stackInSlot.setCount(max);
 						slot.onSlotChanged();
 						changed = true;
 					}
 				}
 			}
 		}
-		if (stackToShift.stackSize > 0) {
-			for (int slotIndex = start; stackToShift.stackSize > 0 && slotIndex < end; slotIndex++) {
-				Slot slot = (Slot) inventorySlots.get(slotIndex);
+		if (stackToShift.getCount() > 0) {
+			for (int slotIndex = start; stackToShift.getCount() > 0 && slotIndex < end; slotIndex++) {
+				Slot slot = inventorySlots.get(slotIndex);
 				ItemStack stackInSlot = slot.getStack();
-				if (stackInSlot == null) {
+				if (stackInSlot.isEmpty()) {
 					int max = Math.min(stackToShift.getMaxStackSize(), slot.getSlotStackLimit());
 					stackInSlot = stackToShift.copy();
-					stackInSlot.stackSize = Math.min(stackToShift.stackSize, max);
-					stackToShift.stackSize -= stackInSlot.stackSize;
+					stackInSlot.setCount(Math.min(stackToShift.getCount(), max));
+					stackToShift.setCount(stackToShift.getCount() - stackInSlot.getCount());
 					slot.putStack(stackInSlot);
 					slot.onSlotChanged();
 					changed = true;
@@ -135,7 +135,7 @@ public class ContainerRecon extends Container {
 
 	private boolean tryShiftItem(ItemStack stackToShift, int numSlots) {
 		for (int machineIndex = 0; machineIndex < numSlots - 9 * 4; machineIndex++) {
-			Slot slot = (Slot) inventorySlots.get(machineIndex);
+			Slot slot = inventorySlots.get(machineIndex);
 			if (!slot.isItemValid(stackToShift)) {
 				continue;
 			}

@@ -1,12 +1,18 @@
 package org.mcupdater.reconstructor;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -15,30 +21,33 @@ import net.minecraftforge.energy.EnergyStorage;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileRecon extends TileEntity implements ITickable, ISidedInventory
+public class TileRecon extends TileEntityLockableLoot implements ITickable
 {
-	private final BasicInventory inv;
+	//private final BasicInventory inv;
+	private NonNullList<ItemStack> workspace;
 	private EnumFacing orientation = EnumFacing.DOWN;
 	private EnergyStorage storage = new EnergyStorage(Reconstructor.energyPerPoint * 1000);
 
-	public TileRecon(){
-		inv = new BasicInventory(1,"Processing",1);
+	public TileRecon() {
+		this.workspace = NonNullList.withSize(1, ItemStack.EMPTY);
 	}
 
 	@Override
 	public void update() {
-		if (storage.getEnergyStored() > Reconstructor.energyPerPoint) {
-			if (tryRepair()) {
-				storage.extractEnergy(Reconstructor.energyPerPoint, false);
+		if (!world.isRemote) {
+			if (storage.getEnergyStored() > Reconstructor.energyPerPoint) {
+				if (tryRepair()) {
+					storage.extractEnergy(Reconstructor.energyPerPoint, false);
+				}
 			}
 		}
 	}
 
 	public boolean tryRepair() {
-		if (getStackInSlot(0) == null)
+		if (getStackInSlot(0).isEmpty())
 			return false;
 
-		if (!getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
+		if (isExtractable()) {
 			ejectItem();
 			return false;
 		}
@@ -55,8 +64,12 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 		return true;
 	}
 
+	private boolean isExtractable() {
+		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
+	}
+
 	private void ejectItem() {
-		if (Utils.addToPriorityInventory(worldObj, this.pos, getStackInSlot(0))) {
+		if (Utils.addToPriorityInventory(this.getWorld(), this.pos, getStackInSlot(0).copy())) {
 			decrStackSize(0, 1);
 			return;
 		}
@@ -79,9 +92,20 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 	}
 	
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
-		return true;
+	public boolean isUsableByPlayer(EntityPlayer player) {
+		if (this.world == null)
+		{
+			return true;
+		}
+
+		if (this.world.getTileEntity(this.pos) != this)
+		{
+			return false;
+		}
+
+		return player.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) <= 64D;
 	}
+
 
 	@Override
 	public void openInventory(EntityPlayer player) {
@@ -95,28 +119,36 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 
 	@Override
 	public int getSizeInventory() {
-		return inv.getSizeInventory();
+		return this.workspace.size();
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		return inv.getStackInSlot(slot);
+		return this.workspace.get(slot);
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amount) {
-		return inv.decrStackSize(slot, amount);
+	public ItemStack decrStackSize(int index, int count)
+	{
+		this.fillWithLoot(null);
+		if (isExtractable()) {
+			ItemStack itemstack = ItemStackHelper.getAndSplit(this.getItems(), index, count);
+
+			if (!itemstack.isEmpty()) {
+				this.markDirty();
+			}
+
+			return itemstack;
+		} else {
+			return ItemStack.EMPTY;
+		}
 	}
 
-	@Nullable
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return null;
-	}
-
-	@Override
-	public void setInventorySlotContents(int slot, ItemStack itemstack) {
-		inv.setInventorySlotContents(slot, itemstack);
+	public ItemStack removeStackFromSlot(int index)
+	{
+		this.fillWithLoot(null);
+		return isExtractable() ? ItemStackHelper.getAndRemove(this.getItems(), index) : ItemStack.EMPTY;
 	}
 
 	@Override
@@ -125,64 +157,33 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 	}
 
 	@Override
+	public void markDirty() {
+		super.markDirty();
+	}
+
+	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		return itemstack.getItem().isDamageable();
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
-	public void clear() {
-
-	}
-
-	@Override
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
-		inv.readFromNBT(data);
+		this.workspace = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+		ItemStackHelper.loadAllItems(data, this.workspace);
 		if (data.hasKey("energy")) {
 			storage.receiveEnergy(data.getInteger("energy"),false);
 		}
+		this.orientation = EnumFacing.VALUES[data.getByte("orientation")];
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
-		inv.writeToNBT(data);
+		ItemStackHelper.saveAllItems(data, this.workspace);
 		data.setInteger("energy", storage.getEnergyStored());
+		data.setByte("orientation", (byte) this.orientation.ordinal());
 		return data;
-	}
-
-	@Override
-	public int[] getSlotsForFace(EnumFacing side) {
-		return new int[]{0};
-	}
-
-	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
-		return true;
-	}
-
-	@Override
-	public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-		if (getStackInSlot(0) != null) {
-			return (!getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow)));
-		} else {
-			return false;
-		}
 	}
 
 	@Override
@@ -209,6 +210,27 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 	}
 
 	@Override
+	public SPacketUpdateTileEntity getUpdatePacket()
+	{
+		NBTTagCompound compound = new NBTTagCompound();
+
+		compound.setByte("orientation", (byte) this.orientation.ordinal());
+
+		return new SPacketUpdateTileEntity(this.pos, 0, compound);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+	{
+		if (pkt.getTileEntityType() == 0)
+		{
+			NBTTagCompound compound = pkt.getNbtCompound();
+
+			this.orientation = EnumFacing.VALUES[compound.getByte("orientation")];
+		}
+	}
+
+	@Override
 	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(storage);
@@ -221,4 +243,39 @@ public class TileRecon extends TileEntity implements ITickable, ISidedInventory
 	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
 		return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
 	}
+
+	@Override
+	public NBTTagCompound getUpdateTag()
+	{
+		return this.writeToNBT(new NBTTagCompound());
+	}
+
+	@Override
+	public NonNullList<ItemStack> getItems()
+	{
+		return this.workspace;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		for (ItemStack itemstack : this.workspace)
+		{
+			if (!itemstack.isEmpty())
+			{
+				return false;
+			}
+		}
+
+		return true;	}
+
+	@Override
+	public Container createContainer(InventoryPlayer playerInventory, EntityPlayer playerIn) {
+		return new ContainerRecon(playerInventory, this);
+	}
+
+	@Override
+	public String getGuiID() {
+		return "reconstructor:reconstructorblock";
+	}
+
 }

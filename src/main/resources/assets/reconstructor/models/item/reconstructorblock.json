@@ -1,5 +1,5 @@
 {
-  "parent": "reconstructor:block/reconstructorBlock",
+  "parent": "reconstructor:block/reconstructorblock",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

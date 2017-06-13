@@ -2,7 +2,7 @@
 {
   "modid": "reconstructor",
   "name": "Reconstructor",
-  "description": "Repair your stuff using RF",
+  "description": "Repair your stuff using Forge Energy",
   "version": "@version@",
   "mcversion": "@mcversion@",
   "url": "",

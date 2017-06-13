@@ -10,24 +10,24 @@ import net.minecraft.util.text.TextComponentString;
 public class AddBlacklistCommand extends CommandBase
 {
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "recon_blacklist";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender) {
+	public String getUsage(ICommandSender sender) {
 		return "";
 	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] params) throws CommandException {
 		if (!(sender instanceof EntityPlayerMP)) {
-			sender.addChatMessage(new TextComponentString("This command must be issued by an opped player in game"));
+			sender.sendMessage(new TextComponentString("This command must be issued by an opped player in game"));
 			return;
 		}
 		EntityPlayerMP player = (EntityPlayerMP) sender;
 		if (player.getActiveItemStack() == null) {
-			sender.addChatMessage(new TextComponentString("This command must be issued while holding the item to be blacklisted."));
+			sender.sendMessage(new TextComponentString("This command must be issued while holding the item to be blacklisted."));
 			return;
 		}
 		Reconstructor.blacklist.add(player.getActiveItemStack().getUnlocalizedName());
