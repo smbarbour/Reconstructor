@@ -1,4 +1,4 @@
-package org.mcupdater.reconstructor;
+package org.mcupdater.reconstructor.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,6 +7,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import org.mcupdater.reconstructor.tile.TileRecon;
 import org.mcupdater.reconstructor.helpers.StackHelper;
 
 public class ContainerRecon extends Container {

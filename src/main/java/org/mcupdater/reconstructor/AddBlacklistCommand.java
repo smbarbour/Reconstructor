@@ -30,9 +30,9 @@ public class AddBlacklistCommand extends CommandBase
 			sender.sendMessage(new TextComponentString("This command must be issued while holding the item to be blacklisted."));
 			return;
 		}
-		Reconstructor.blacklist.add(player.getActiveItemStack().getUnlocalizedName());
-		Reconstructor.blProperty.set(Reconstructor.blacklist.toArray(new String[Reconstructor.blacklist.size()]));
-		Reconstructor.config.save();
+		Config.blacklist.add(player.getActiveItemStack().getUnlocalizedName());
+		Config.blProperty.set(Config.blacklist.toArray(new String[Config.blacklist.size()]));
+		Config.config.save();
 	}
 
 }

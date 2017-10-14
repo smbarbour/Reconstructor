@@ -1,0 +1,25 @@
+{
+  "result": {
+    "item": "reconstructor:reconstructorblock"
+  },
+  "pattern": [
+    "iii",
+    "iai",
+    "brb"
+  ],
+  "type": "crafting_shaped",
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "a": {
+      "item": "minecraft:anvil"
+    },
+    "b": {
+      "item": "minecraft:book"
+    },
+    "r": {
+      "item": "minecraft:redstone"
+    }
+  }
+}

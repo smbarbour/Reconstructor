@@ -1,13 +1,11 @@
-package org.mcupdater.reconstructor;
+package org.mcupdater.reconstructor.tile;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.util.EnumFacing;
@@ -17,6 +15,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
+import org.mcupdater.reconstructor.Config;
+import org.mcupdater.reconstructor.gui.ContainerRecon;
+import org.mcupdater.reconstructor.helpers.InventoryHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,7 +27,7 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	//private final BasicInventory inv;
 	private NonNullList<ItemStack> workspace;
 	private EnumFacing orientation = EnumFacing.DOWN;
-	private EnergyStorage storage = new EnergyStorage(Reconstructor.energyPerPoint * 1000);
+	private EnergyStorage storage = new EnergyStorage(Config.energyPerPoint * 1000);
 
 	public TileRecon() {
 		this.workspace = NonNullList.withSize(1, ItemStack.EMPTY);
@@ -35,9 +36,9 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	@Override
 	public void update() {
 		if (!world.isRemote) {
-			if (storage.getEnergyStored() > Reconstructor.energyPerPoint) {
+			if (storage.getEnergyStored() > Config.energyPerPoint) {
 				if (tryRepair()) {
-					storage.extractEnergy(Reconstructor.energyPerPoint, false);
+					storage.extractEnergy(Config.energyPerPoint, false);
 				}
 			}
 		}
@@ -65,30 +66,14 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	}
 
 	private boolean isExtractable() {
-		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
+		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Config.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Config.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
 	}
 
 	private void ejectItem() {
-		if (Utils.addToPriorityInventory(this.getWorld(), this.pos, getStackInSlot(0).copy())) {
+		if (InventoryHelper.addToPriorityInventory(this.getWorld(), this.pos, getStackInSlot(0).copy())) {
 			decrStackSize(0, 1);
 			return;
 		}
-		
-/*
-		float f = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
-		float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
-		float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
-
-		EntityItem entityitem = new EntityItem(this.worldObj, this.pos.getX() + f, this.pos.getY() + f1 + 0.5F, this.pos.getZ() + f2, getStackInSlot(0));
-
-		float f3 = 0.05F;
-		entityitem.motionX = (float) this.worldObj.rand.nextGaussian() * f3;
-		entityitem.motionY = (float) this.worldObj.rand.nextGaussian() * f3 + 1.0F;
-		entityitem.motionZ = (float) this.worldObj.rand.nextGaussian() * f3;
-		this.worldObj.spawnEntityInWorld(entityitem);
-		
-		decrStackSize(0, 1);
-*/
 	}
 	
 	@Override
@@ -219,7 +204,7 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 		return new SPacketUpdateTileEntity(this.pos, 0, compound);
 	}
 
-	@Override
+/*	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
 	{
 		if (pkt.getTileEntityType() == 0)
@@ -228,7 +213,7 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 
 			this.orientation = EnumFacing.VALUES[compound.getByte("orientation")];
 		}
-	}
+	}*/
 
 	@Override
 	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {

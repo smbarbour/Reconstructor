@@ -1,34 +1,31 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
-	repositories {
-		jcenter()
-		maven {
-			name = "forge"
-			url = "http://files.minecraftforge.net/maven"
-		}
+    repositories {
+	jcenter()
+	maven {
+	    name = "forge"
+	    url = "http://files.minecraftforge.net/maven"
 	}
-	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-	}
+    }
+    dependencies {
+	classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.10"
+version = "2.11"
 group= "org.mcupdater.reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "reconstructor"
 
 minecraft {
-	version = "1.11.2-13.20.0.2315"
+	version = "1.12.2-14.23.0.2509"
 	runDir = "run"
-	mappings = "snapshot_20161220"
+	mappings = "snapshot_20171003"
 }
 
 dependencies {
-    //compile files("lib/CoFHLib-[1.7.10]1.0.3-175-dev.jar")
-    // compile files("lib/ThermalFoundation-[1.7.10]1.0.0B3-dev-8.jar")
-    // compile files("lib/ThermalExpansion-[1.7.10]4.0.0B5-dev-13.jar")
 }
 
 processResources

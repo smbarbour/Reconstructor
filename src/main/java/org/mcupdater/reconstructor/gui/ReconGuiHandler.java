@@ -1,4 +1,4 @@
-package org.mcupdater.reconstructor;
+package org.mcupdater.reconstructor.gui;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -6,6 +6,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import org.mcupdater.reconstructor.tile.BlockRecon;
+import org.mcupdater.reconstructor.tile.TileRecon;
 
 public class ReconGuiHandler implements IGuiHandler
 {
