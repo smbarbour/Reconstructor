@@ -7,13 +7,14 @@
     "iai",
     "brb"
   ],
-  "type": "crafting_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "i": {
       "item": "minecraft:iron_ingot"
     },
     "a": {
-      "item": "minecraft:anvil"
+      "item": "minecraft:anvil",
+      "data": 0
     },
     "b": {
       "item": "minecraft:book"
