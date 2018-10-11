@@ -7,7 +7,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import org.mcupdater.reconstructor.tile.BlockRecon;
 import org.mcupdater.reconstructor.tile.TileRecon;
 
 import java.util.ArrayList;

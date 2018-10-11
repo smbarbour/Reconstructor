@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.apache.logging.log4j.Logger;
 import org.mcupdater.reconstructor.gui.ReconGuiHandler;
 import org.mcupdater.reconstructor.proxy.CommonProxy;
 import org.mcupdater.reconstructor.tile.TileRecon;
@@ -21,11 +22,13 @@ public class Reconstructor {
 	public static ModMetadata metadata;
 	@Mod.Instance("reconstructor")
 	public static Reconstructor instance;
+	private Logger logger;
 
 	@Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evt) {
 		metadata = evt.getModMetadata();
 		Config.init(evt.getSuggestedConfigurationFile());
+		this.logger = evt.getModLog();
     }
 
 	@Mod.EventHandler
@@ -38,6 +41,9 @@ public class Reconstructor {
 	public void serverStarting(FMLServerStartingEvent e){
 		e.registerServerCommand(new AddBlacklistCommand());
 	}
-	
 
+
+	public Logger getLogger() {
+		return logger;
+	}
 }

@@ -16,6 +16,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
 import org.mcupdater.reconstructor.Config;
+import org.mcupdater.reconstructor.Reconstructor;
 import org.mcupdater.reconstructor.gui.ContainerRecon;
 import org.mcupdater.reconstructor.helpers.InventoryHelper;
 
@@ -52,21 +53,29 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 			ejectItem();
 			return false;
 		}
-		getStackInSlot(0).setItemDamage(getStackInSlot(0).getItemDamage() - 1);
-		if (getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) {
-			NBTTagCompound tag = getStackInSlot(0).getTagCompound();
-			if (tag != null && tag.hasKey("Stats")) {
-				NBTTagCompound stats = tag.getCompoundTag("Stats");
-				stats.setBoolean("Broken",false);
-				tag.setTag("Stats", stats);
-				getStackInSlot(0).setTagCompound(tag);
-			}
+		int repairAmount = Config.scaledRepair ? Math.max(1, (getStackInSlot(0).getMaxDamage() - getStackInSlot(0).getItemDamage())/100) : 1;
+		getStackInSlot(0).setItemDamage(getStackInSlot(0).getItemDamage() - repairAmount);
+		NBTTagCompound tag = getStackInSlot(0).getTagCompound();
+		if (tag != null && tag.hasKey("Stats")) {
+			NBTTagCompound stats = tag.getCompoundTag("Stats");
+			stats.setBoolean("Broken",false);
+			tag.setTag("Stats", stats);
+			getStackInSlot(0).setTagCompound(tag);
 		}
 		return true;
 	}
 
 	private boolean isExtractable() {
-		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || getStackInSlot(0).getItem().getClass().toString().contains("slimeknights.tconstruct.tools")) || Config.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Config.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
+		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || isWhitelisted(getStackInSlot(0).getItem().getClass().toString())) || Config.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Config.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
+	}
+
+	private boolean isWhitelisted(String className) {
+		for (String entry : Config.whitelist) {
+			if (className.contains(entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void ejectItem() {

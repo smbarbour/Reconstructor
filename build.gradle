@@ -15,12 +15,12 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "2.11a"
+version = "2.13"
 group= "org.mcupdater.reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "reconstructor"
 
 minecraft {
-	version = "1.12.2-14.23.0.2509"
+	version = "1.12.2-14.23.5.2768"
 	runDir = "run"
 	mappings = "snapshot_20171003"
 }

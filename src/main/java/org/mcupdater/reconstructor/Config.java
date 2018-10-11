@@ -18,7 +18,9 @@ public class Config {
 	public static Set<String> blacklist;
 	public static Property blProperty;
 	public static boolean restrictRepairs;
-
+	public static boolean scaledRepair;
+	public static Property wlProperty;
+	public static Set<String> whitelist;
 
 	public static void init(File configFile) {
 		config = new Configuration(configFile);
@@ -27,8 +29,11 @@ public class Config {
 		config.getCategory("General").remove("Recipe_Item");
 		energyPerPoint = config.get("General", "EnergyUse", 50, "How much energy is required per point of damage.").getInt();
 		restrictRepairs = config.get("General", "Restricted", false, "If true, will only repair things that extend the tool, armor, sword and bow classes.").getBoolean();
+		scaledRepair = config.get("General", "Scaled", true, "Repair amount per tick will scale based on durability").getBoolean();
 		blProperty = config.get("General", "Blacklist", new String[0], "Item classes that appear in this list will not be repaired by the Reconstructor.");
 		blacklist = new HashSet<String>(Arrays.asList(blProperty.getStringList()));
+		wlProperty = config.get("General", "Whitelist", new String[]{"slimeknights.tconstruct.tools","landmaster.plustic.tools","c4.conarm.common.items.armor"}, "Package names of mods that should be repaired by the Reconstructor.");
+		whitelist = new HashSet<String>(Arrays.asList(wlProperty.getStringList()));
 		if (config.hasChanged()) {
 			config.save();
 		}
