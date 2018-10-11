@@ -31,6 +31,8 @@ public class Reconstructor {
 	private String recipeItem;
 	public static Set<String> blacklist;
 	public static Property blProperty;
+	public static Property wlProperty;
+	public static Set<String> whitelist;
 
 	@EventHandler
     public void initialize(FMLPreInitializationEvent evt) {
@@ -41,6 +43,8 @@ public class Reconstructor {
         restrictRepairs = config.get("General", "Restricted", false, "If true, will only repair things that extend the tool, armor, sword and bow classes.").getBoolean(false);
 		blProperty = config.get("General", "Blacklist", new String[0], "Item classes that appear in this list will not be repaired by the Reconstructor.");
 		blacklist = new HashSet<String>(Arrays.asList(blProperty.getStringList()));
+		wlProperty = config.get("General", "Whitelist", new String[]{"tconstruct","crazypants.enderio.item.darksteel"}, "Package names of mods that should be repaired by the Reconstructor.");
+		whitelist = new HashSet<String>(Arrays.asList(wlProperty.getStringList()));
         if (config.hasChanged()) {
             config.save();
         }

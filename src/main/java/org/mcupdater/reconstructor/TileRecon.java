@@ -29,13 +29,26 @@ public class TileRecon extends TileEnergyHandler implements ISidedInventory
 	public boolean tryRepair() {
 		if (getStackInSlot(0) == null)
 			return false;
-			
-		if (!getStackInSlot(0).isItemDamaged() || !getStackInSlot(0).getItem().isRepairable() || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
+
+		if (!isReallyDamaged(getStackInSlot(0)) || !(getStackInSlot(0).getItem().isRepairable() || isWhitelisted(getStackInSlot(0).getItem().getClass().toString())) || Reconstructor.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Reconstructor.instance.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow))) {
 			ejectItem();
 			return false;
 		}
 		getStackInSlot(0).damageItem(-1, new GremlinEntity(this.worldObj));
 		return true;
+	}
+
+	private boolean isReallyDamaged(ItemStack stack) {
+		return stack.isItemStackDamageable() && (stack.getItemDamage() < stack.getMaxDamage());
+	}
+
+	private boolean isWhitelisted(String className) {
+		for (String entry : Reconstructor.whitelist) {
+			if (className.contains(entry)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void ejectItem() {
