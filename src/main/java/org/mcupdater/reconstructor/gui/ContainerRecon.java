@@ -13,7 +13,7 @@ import org.mcupdater.reconstructor.helpers.StackHelper;
 public class ContainerRecon extends Container {
 
 	private TileRecon tile;
-	private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
+	private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[] {EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET, EntityEquipmentSlot.OFFHAND};
 
 	public ContainerRecon(final InventoryPlayer inventoryplayer, TileRecon t) {
 		this.tile = t;
@@ -41,6 +41,25 @@ public class ContainerRecon extends Container {
 	            }
             });
         }
+		final EntityEquipmentSlot offhandSlot = VALID_EQUIPMENT_SLOTS[4];
+		this.addSlotToContainer(new Slot(inventoryplayer, 40, 26, 62)
+		{
+			public int getSlotStackLimit()
+			{
+				return 1;
+			}
+
+			public boolean isItemValid(ItemStack itemStack)
+			{
+				if (itemStack.isEmpty()) return false;
+				return itemStack.getItem().isValidArmor(itemStack, offhandSlot, inventoryplayer.player);
+			}
+
+			public String getSlotTexture()
+			{
+				return "minecraft:items/empty_armor_slot_shield";
+			}
+		});
 
 		for (int i = 0; i < 3; i++) {
 			for (int k = 0; k < 9; k++) {
