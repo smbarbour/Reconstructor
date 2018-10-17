@@ -41,7 +41,6 @@ public class ContainerRecon extends Container {
 	            }
             });
         }
-		final EntityEquipmentSlot offhandSlot = VALID_EQUIPMENT_SLOTS[4];
 		this.addSlotToContainer(new Slot(inventoryplayer, 40, 26, 62)
 		{
 			public int getSlotStackLimit()
@@ -52,7 +51,7 @@ public class ContainerRecon extends Container {
 			public boolean isItemValid(ItemStack itemStack)
 			{
 				if (itemStack.isEmpty()) return false;
-				return itemStack.getItem().isValidArmor(itemStack, offhandSlot, inventoryplayer.player);
+				return true;
 			}
 
 			public String getSlotTexture()

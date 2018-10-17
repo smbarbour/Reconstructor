@@ -57,14 +57,16 @@ public class InventoryHelper
 		for (EnumFacing side : sides) {
 			TileEntity target;
 			target = world.getTileEntity(pos.offset(side));
-			if (target instanceof IInventory) {
+			if (target != null) {
 				IItemHandler invOutput = getWrapper(target, side.getOpposite());
-				if (canStackFitInInventory(invOutput, stack)) {
-					ItemStack remain = insertItemStackIntoInventory(invOutput, stack);
-					if (remain.isEmpty()) {
-						return true;
+				if (invOutput != EmptyHandler.INSTANCE) {
+					if (canStackFitInInventory(invOutput, stack)) {
+						ItemStack remain = insertItemStackIntoInventory(invOutput, stack);
+						if (remain.isEmpty()) {
+							return true;
+						}
+						return false;
 					}
-					return false;
 				}
 			}
 		}
