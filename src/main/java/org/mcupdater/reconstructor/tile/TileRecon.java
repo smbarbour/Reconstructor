@@ -15,13 +15,16 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
+import org.apache.logging.log4j.Level;
 import org.mcupdater.reconstructor.Config;
 import org.mcupdater.reconstructor.Reconstructor;
 import org.mcupdater.reconstructor.gui.ContainerRecon;
+import org.mcupdater.reconstructor.helpers.DebugHelper;
 import org.mcupdater.reconstructor.helpers.InventoryHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Set;
 
 public class TileRecon extends TileEntityLockableLoot implements ITickable
 {
@@ -37,7 +40,7 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	@Override
 	public void update() {
 		if (!world.isRemote) {
-			if (storage.getEnergyStored() > Config.energyPerPoint) {
+			if (Config.energyPerPoint == 0 || storage.getEnergyStored() > Config.energyPerPoint) {
 				if (tryRepair()) {
 					storage.extractEnergy(Config.energyPerPoint, false);
 				}
@@ -79,6 +82,19 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	}
 
 	private void ejectItem() {
+		if (Config.debug) {
+			ItemStack stack = getStackInSlot(0);
+			Reconstructor.instance.getLogger().log(Level.INFO, "Is Damaged: " + stack.isItemDamaged());
+			Reconstructor.instance.getLogger().log(Level.INFO, "Is Repairable: " + stack.getItem().isRepairable());
+			Reconstructor.instance.getLogger().log(Level.INFO, "Is Whitelisted: " + isWhitelisted(stack.getItem().getClass().toString()));
+			Reconstructor.instance.getLogger().log(Level.INFO, "Is Blacklisted: " + Config.blacklist.contains(stack.getItem().getUnlocalizedName()));
+			Reconstructor.instance.getLogger().log(Level.INFO, "Is Restricted: " + (Config.restrictRepairs && !(stack.getItem() instanceof ItemTool || stack.getItem() instanceof ItemArmor || stack.getItem() instanceof ItemSword || stack.getItem() instanceof ItemBow)));
+			Reconstructor.instance.getLogger().log(Level.INFO, "Class hierarchy: " + stack.getItem().getClass().toString());
+			Set<Class<?>> classes = DebugHelper.getAllExtendedOrImplementedTypesRecursively(stack.getItem().getClass());
+			for (Class<?> clazz : classes) {
+				Reconstructor.instance.getLogger().log(Level.INFO, "  " + clazz.getName());
+			}
+		}
 		if (InventoryHelper.addToPriorityInventory(this.getWorld(), this.pos, getStackInSlot(0).copy())) {
 			decrStackSize(0, 1);
 			return;
