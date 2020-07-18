@@ -3,3 +3,7 @@
 .idea/
 build/
 run/
+out/
+
+*.hprof
+*.iws
