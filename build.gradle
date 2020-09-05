@@ -1,45 +1,74 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
-    repositories {
-	jcenter()
-	maven {
-	    name = "forge"
-	    url = "http://files.minecraftforge.net/maven"
+	repositories {
+		maven { url = 'https://files.minecraftforge.net/maven' }
+		jcenter()
+		mavenCentral()
 	}
-    }
-    dependencies {
-	classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+	}
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 
-version = "2.16"
+version = "2.17"
 group= "org.mcupdater.reconstructor" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "reconstructor"
 
 minecraft {
-	version = "1.12.2-14.23.5.2768"
-	runDir = "run"
-	mappings = "snapshot_20171003"
+	// The mappings can be changed at any time, and must be in the following format.
+	// snapshot_YYYYMMDD   Snapshot are built nightly.
+	// stable_#            Stables are built at the discretion of the MCP team.
+	// Use non-default mappings at your own risk. they may not always work.
+	// Simply re-run your setup task after changing the mappings to update your workspace.
+	//mappings channel: 'snapshot', version: '20171003-1.12'
+	mappings channel: 'snapshot', version: '20171003-1.12'
+	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+	// accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+	// Default run configurations.
+	// These can be tweaked, removed, or duplicated as needed.
+	runs {
+		client {
+			workingDirectory project.file('run')
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+		}
+
+		server {
+
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+		}
+	}
 }
 
 dependencies {
+	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
 }
 
 processResources
 {
 	// this will ensure that this task is redone when the versions change.
 	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
+	inputs.property "mcversion", "1.12.2"
 
 	// replace stuff in mcmod.info, nothing else
 	from(sourceSets.main.resources.srcDirs) {
 		include 'mcmod.info'
 
     	// replace version and mcversion
-		filter(ReplaceTokens, tokens: [version: project.version, mcversion: project.minecraft.version])
+		filter(ReplaceTokens, tokens: [version: project.version, mcversion: "1.12.2"])
 	}
 
 	// copy everything else, thats not the mcmod.info

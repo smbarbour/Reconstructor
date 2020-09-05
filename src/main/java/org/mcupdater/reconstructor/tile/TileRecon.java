@@ -15,12 +15,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.Level;
 import org.mcupdater.reconstructor.Config;
 import org.mcupdater.reconstructor.Reconstructor;
 import org.mcupdater.reconstructor.gui.ContainerRecon;
 import org.mcupdater.reconstructor.helpers.DebugHelper;
 import org.mcupdater.reconstructor.helpers.InventoryHelper;
+import org.mcupdater.reconstructor.helpers.ReconInvWrapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,9 +34,11 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 	private NonNullList<ItemStack> workspace;
 	private EnumFacing orientation = EnumFacing.DOWN;
 	private EnergyStorage storage = new EnergyStorage(Config.energyPerPoint * 1000);
+	private IItemHandler itemHandler;
 
 	public TileRecon() {
 		this.workspace = NonNullList.withSize(1, ItemStack.EMPTY);
+		this.itemHandler = new ReconInvWrapper(this);
 	}
 
 	@Override
@@ -68,7 +72,7 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 		return true;
 	}
 
-	private boolean isExtractable() {
+	public boolean isExtractable() {
 		return !getStackInSlot(0).isItemDamaged() || !(getStackInSlot(0).getItem().isRepairable() || isWhitelisted(getStackInSlot(0).getItem().getClass().toString())) || Config.blacklist.contains(getStackInSlot(0).getItem().getUnlocalizedName()) || (Config.restrictRepairs && !(getStackInSlot(0).getItem() instanceof ItemTool || getStackInSlot(0).getItem() instanceof ItemArmor || getStackInSlot(0).getItem() instanceof ItemSword || getStackInSlot(0).getItem() instanceof ItemBow));
 	}
 
@@ -245,13 +249,15 @@ public class TileRecon extends TileEntityLockableLoot implements ITickable
 		if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(storage);
 		}
+		if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+			return (T) (itemHandler == null ? (itemHandler = new ReconInvWrapper(this)) : itemHandler);
 
 		return super.getCapability(capability, facing);
 	}
 
 	@Override
 	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
-		return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+		return capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
 	}
 
 	@Override
