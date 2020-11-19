@@ -1,20 +1,17 @@
 {
-  "result": {
-    "item": "reconstructor:reconstructorblock"
-  },
+  "type": "minecraft:crafting_shaped",
+  "group": "reconstructor",
   "pattern": [
     "iii",
     "iai",
     "brb"
   ],
-  "type": "minecraft:crafting_shaped",
   "key": {
     "i": {
       "item": "minecraft:iron_ingot"
     },
     "a": {
-      "item": "minecraft:anvil",
-      "data": 0
+      "tag": "minecraft:anvil"
     },
     "b": {
       "item": "minecraft:book"
@@ -22,5 +19,8 @@
     "r": {
       "item": "minecraft:redstone"
     }
+  },
+  "result": {
+    "item": "reconstructor:reconstructor"
   }
 }
