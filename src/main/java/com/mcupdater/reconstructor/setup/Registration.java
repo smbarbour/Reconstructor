@@ -32,11 +32,11 @@ public class Registration {
     }
 
     public static final RegistryObject<BlockRecon> RECONBLOCK = BLOCKS.register("reconstructor", BlockRecon::new);
-    public static final RegistryObject<Item> RECONBLOCK_ITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONBLOCK.get(), new Item.Properties().group(ModSetup.ITEM_GROUP)));
-    public static final RegistryObject<TileEntityType<TileRecon>> RECONBLOCK_TILE = TILES.register("reconstructor", () -> TileEntityType.Builder.create(TileRecon::new, RECONBLOCK.get()).build(null));
+    public static final RegistryObject<Item> RECONBLOCK_ITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONBLOCK.get(), new Item.Properties().tab(ModSetup.ITEM_GROUP)));
+    public static final RegistryObject<TileEntityType<TileRecon>> RECONBLOCK_TILE = TILES.register("reconstructor", () -> TileEntityType.Builder.of(TileRecon::new, RECONBLOCK.get()).build(null));
     public static final RegistryObject<ContainerType<ContainerRecon>> RECONBLOCK_CONTAINER = CONTAINERS.register("reconstructor", () -> IForgeContainerType.create((windowId, inv, data) -> {
         BlockPos pos = data.readBlockPos();
-        World world = inv.player.getEntityWorld();
+        World world = inv.player.level;
         return new ContainerRecon(windowId, world, pos, inv, inv.player);
     }));
 }

@@ -28,7 +28,7 @@ public class ContainerRecon extends ContainerPowered {
 
     public ContainerRecon(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(Registration.RECONBLOCK_CONTAINER.get(), windowId);
-        localTileEntity = world.getTileEntity(pos) instanceof TileRecon ? (TileRecon) world.getTileEntity(pos) : null;
+        localTileEntity = world.getBlockEntity(pos) instanceof TileRecon ? (TileRecon) world.getBlockEntity(pos) : null;
         tileEntity = localTileEntity;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
@@ -72,45 +72,45 @@ public class ContainerRecon extends ContainerPowered {
             final EquipmentSlotType entityequipmentslot = VALID_EQUIPMENT_SLOTS[i];
             addSlot(new ArmorSlotItemHandler(playerInventory, 36 + (3 - i), 8, 8 + i * 18, entityequipmentslot, playerEntity));
         }
-        this.addSlot(new SlotItemHandler(playerInventory, 40, 26, 62).setBackground(PlayerContainer.LOCATION_BLOCKS_TEXTURE, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD));
+        this.addSlot(new SlotItemHandler(playerInventory, 40, 26, 62).setBackground(PlayerContainer.BLOCK_ATLAS, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD));
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
-        return isWithinUsableDistance(IWorldPosCallable.of(localTileEntity.getWorld(), localTileEntity.getPos()), playerEntity, Registration.RECONBLOCK.get());
+    public boolean stillValid(PlayerEntity playerIn) {
+        return stillValid(IWorldPosCallable.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONBLOCK.get());
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerEntity, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerEntity, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-        if (slot != null && slot.getHasStack()) {
-            ItemStack stack = slot.getStack();
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack stack = slot.getItem();
             itemstack = stack.copy();
             if (index == 0) {
-                if (!this.mergeItemStack(stack, 1, 37, true)) {
+                if (!this.moveItemStackTo(stack, 1, 37, true)) {
                     return ItemStack.EMPTY;
                 }
-                slot.onSlotChange(stack, itemstack);
+                slot.onQuickCraft(stack, itemstack);
             } else {
                 if (this.localTileEntity.isExtractable(stack)) {
-                    if (!this.mergeItemStack(stack, 0, 1, false)) {
+                    if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else
                 if (index < 28) {
-                    if (!this.mergeItemStack(stack, 28, 37, false)) {
+                    if (!this.moveItemStackTo(stack, 28, 37, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (index < 37 && !this.mergeItemStack(stack, 1, 28, false)) {
+                } else if (index < 37 && !this.moveItemStackTo(stack, 1, 28, false)) {
                     return ItemStack.EMPTY;
                 }
             }
 
             if (stack.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
 
             if (stack.getCount() == itemstack.getCount()) {
@@ -122,4 +122,7 @@ public class ContainerRecon extends ContainerPowered {
         return itemstack;
     }
 
+    public TileRecon getBlockEntity() {
+        return localTileEntity;
+    }
 }
