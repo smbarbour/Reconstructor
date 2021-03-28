@@ -12,6 +12,7 @@ import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -24,14 +25,17 @@ public class ContainerRecon extends ContainerPowered {
     private PlayerEntity playerEntity;
     private IItemHandler playerInventory;
 
+    public final IntReferenceHolder data;
+
     private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[] {EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET, EquipmentSlotType.OFFHAND};
 
-    public ContainerRecon(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
+    public ContainerRecon(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player, IntReferenceHolder localData) {
         super(Registration.RECONBLOCK_CONTAINER.get(), windowId);
         localTileEntity = world.getBlockEntity(pos) instanceof TileRecon ? (TileRecon) world.getBlockEntity(pos) : null;
         tileEntity = localTileEntity;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
+        this.data = localData;
 
         if (localTileEntity != null) {
             localTileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
@@ -40,6 +44,7 @@ public class ContainerRecon extends ContainerPowered {
         }
         layoutPlayerInventorySlots(8,84);
         trackPower();
+        addDataSlot(this.data);
     }
 
     private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {

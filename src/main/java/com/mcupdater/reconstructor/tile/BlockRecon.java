@@ -66,7 +66,7 @@ public class BlockRecon extends Block {
 
                     @Override
                     public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-                        return new ContainerRecon(i, world, pos, playerInventory, playerEntity);
+                        return new ContainerRecon(i, world, pos, playerInventory, playerEntity, ((TileRecon) tileEntity).data);
                     }
                 };
                 NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider, tileEntity.getBlockPos());

@@ -37,6 +37,7 @@ public class Registration {
     public static final RegistryObject<ContainerType<ContainerRecon>> RECONBLOCK_CONTAINER = CONTAINERS.register("reconstructor", () -> IForgeContainerType.create((windowId, inv, data) -> {
         BlockPos pos = data.readBlockPos();
         World world = inv.player.level;
-        return new ContainerRecon(windowId, world, pos, inv, inv.player);
+        TileRecon te = (TileRecon) world.getBlockEntity(pos);
+        return new ContainerRecon(windowId, world, pos, inv, inv.player, te.data);
     }));
 }

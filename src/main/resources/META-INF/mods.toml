@@ -1,0 +1,17 @@
+modLoader="javafml"
+loaderVersion="[32,)"
+license="Apache License 2.0"
+[[mods]]
+modId="reconstructor"
+version="${version}"
+displayName="Reconstructor"
+authors="smbarbour"
+description='''
+Repair your stuff using Forge Energy
+'''
+[[dependencies.reconstructor]]
+    modId="mculib"
+    mandatory=true
+    versionRange="[1.0,)"
+    ordering="NONE"
+    side="BOTH"

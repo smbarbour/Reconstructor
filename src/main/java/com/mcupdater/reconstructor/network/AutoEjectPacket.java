@@ -31,5 +31,6 @@ public class AutoEjectPacket {
                 tileRecon.data.set(tileRecon.data.get()-1);
             }
         });
+        ctx.get().setPacketHandled(true);
     }
 }
