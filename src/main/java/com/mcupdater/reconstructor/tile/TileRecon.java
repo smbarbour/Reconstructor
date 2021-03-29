@@ -148,11 +148,6 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
         }
         super.func_73660_a();
 
-        if (Config.DEBUG.get()) {
-            energyStorage.receiveEnergy(10,false);
-            this.setChanged();
-        }
-
     }
 
     private void ejectItem() {
