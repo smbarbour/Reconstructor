@@ -45,7 +45,6 @@ public class ScreenRecon extends ContainerScreen<ContainerRecon> {
     @Override
     protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
         // Do not draw normal container labels
-        Reconstructor.LOGGER.error("Screen read auto-eject");
         btnAutoEject.setMessage(new StringTextComponent("Auto-eject: " + (menu.getBlockEntity().isAutoEject() ? "ON" : "OFF")));
     }
 

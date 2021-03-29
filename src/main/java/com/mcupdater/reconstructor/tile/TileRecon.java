@@ -239,17 +239,11 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
     }
 
     public boolean isAutoEject() {
-        if (this.level != null) {
-            Reconstructor.LOGGER.error((this.level.isClientSide ? "Client" : "Server") + ": isAutoEject() -> " + autoEject);
-        }
         return autoEject;
     }
 
     public void setAutoEject(boolean newValue) {
         this.autoEject = newValue;
-        if (this.level != null) {
-            Reconstructor.LOGGER.error((this.level.isClientSide ? "Client" : "Server") + ": setAutoEject(" + newValue + ")");
-        }
         this.setChanged();
     }
 }
