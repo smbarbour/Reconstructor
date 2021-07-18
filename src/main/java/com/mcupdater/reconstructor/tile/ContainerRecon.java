@@ -93,21 +93,21 @@ public class ContainerRecon extends ContainerPowered {
             ItemStack stack = slot.getItem();
             itemstack = stack.copy();
             if (index == 0) {
-                if (!this.moveItemStackTo(stack, 1, 37, true)) {
+                if (!this.moveItemStackTo(stack, 1, this.getItems().size(), true)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onQuickCraft(stack, itemstack);
             } else {
-                if (this.localTileEntity.isExtractable(stack)) {
+                if (this.localTileEntity.canPlaceItem(0, stack)) {
                     if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else
-                if (index < 28) {
-                    if (!this.moveItemStackTo(stack, 28, 37, false)) {
+                if (index < 29) {
+                    if (!this.moveItemStackTo(stack, 29, 37, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (index < 37 && !this.moveItemStackTo(stack, 1, 28, false)) {
+                } else if (index < 38 && !this.moveItemStackTo(stack, 1, 29, false)) {
                     return ItemStack.EMPTY;
                 }
             }
