@@ -29,7 +29,7 @@ public class Config {
         RESTRICT_REPAIRS = COMMON_BUILDER.comment("If true, will only repair things that extend the tool, armor, sword and bow classes.").define("Restricted", false);
         SCALED_REPAIR = COMMON_BUILDER.comment("Repair amount per tick will scale based on durability").define("Scaled", true);
         BLACKLIST = COMMON_BUILDER.comment("Item classes that appear in this list will not be repaired by the Reconstructor.").defineList("blacklist", new ArrayList<String>(), (Object o) -> true);
-        WHITELIST = COMMON_BUILDER.comment("Package names of mods that should be repaired by the Reconstructor.").defineList("blacklist", Arrays.asList("slimeknights.tconstruct.tools","landmaster.plustic.tools","c4.conarm.common.items.armor"), (Object o) -> true);
+        WHITELIST = COMMON_BUILDER.comment("Package names of mods that should be repaired by the Reconstructor.").defineList("whitelist", Arrays.asList("slimeknights.tconstruct.tools","landmaster.plustic.tools","c4.conarm.common.items.armor"), (Object o) -> true);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.comment("Debug settings").push(CATEGORY_DEBUG);

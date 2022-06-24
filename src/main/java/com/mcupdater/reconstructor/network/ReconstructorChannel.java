@@ -1,9 +1,9 @@
 package com.mcupdater.reconstructor.network;
 
 import com.mcupdater.reconstructor.Reconstructor;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ReconstructorChannel {
     private static final String PROTOCOL_VERSION = "1";

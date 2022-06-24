@@ -1,8 +1,11 @@
 {
-  "parent": "block/orientable",
-  "textures": {
-    "top": "reconstructor:blocks/framed_iron",
-    "front": "reconstructor:blocks/framed_iron_hammer",
-    "side": "reconstructor:blocks/framed_iron"
-  }
+	"parent": "mculib:block/machine",
+	"textures": {
+		"frame": "minecraft:block/iron_block",
+		"corner": "minecraft:block/iron_block",
+		"face": "minecraft:block/iron_block",
+		"inset": "minecraft:block/black_concrete",
+		"overlay": "reconstructor:blocks/hammer",
+		"particle": "minecraft:block/iron_block"
+	}
 }

@@ -5,16 +5,22 @@ import com.mcupdater.mculib.helpers.DebugHelper;
 import com.mcupdater.mculib.helpers.InventoryHelper;
 import com.mcupdater.reconstructor.Reconstructor;
 import com.mcupdater.reconstructor.setup.Config;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -28,13 +34,13 @@ import java.util.Set;
 
 import static com.mcupdater.reconstructor.setup.Registration.RECONBLOCK_TILE;
 
-public class TileRecon extends TileEntityPowered implements ISidedInventory {
+public class TileRecon extends TileEntityPowered implements WorldlyContainer, MenuProvider {
     protected NonNullList<ItemStack> itemStorage = NonNullList.withSize(1, ItemStack.EMPTY);
     private boolean autoEject = false;
 
     private final LazyOptional<IItemHandlerModifiable>[] itemHandler = SidedInvWrapper.create(this, Direction.values());
 
-    public IntReferenceHolder data = new IntReferenceHolder() {
+    public DataSlot data = new DataSlot() {
         @Override
         public int get() {
             return isAutoEject() ? 1 : 0;
@@ -46,8 +52,8 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
         }
     };
 
-    public TileRecon() {
-        super(RECONBLOCK_TILE.get(), Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE);
+    public TileRecon(BlockPos blockPos, BlockState blockState ) {
+        super(RECONBLOCK_TILE.get(), blockPos, blockState,Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE);
     }
 
     @Override
@@ -72,12 +78,12 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
 
     @Override
     public ItemStack removeItem(int index, int count) {
-        return ItemStackHelper.removeItem(this.itemStorage, index, count);
+        return ContainerHelper.removeItem(this.itemStorage, index, count);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-        return ItemStackHelper.takeItem(this.itemStorage, index);
+        return ContainerHelper.takeItem(this.itemStorage, index);
     }
 
     @Override
@@ -97,7 +103,7 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
             message.append("Is Repairable: ").append(stack.isRepairable()).append("\n");
             message.append("Is Whitelisted: ").append(isWhitelisted(stack.getItem().getClass().toString())).append("\n");
             message.append("Is Blacklisted: ").append(Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId())).append("\n");
-            message.append("Is Restricted: ").append((Config.RESTRICT_REPAIRS.get() && !(stack.getItem() instanceof ToolItem || stack.getItem() instanceof ArmorItem || stack.getItem() instanceof SwordItem || stack.getItem() instanceof BowItem))).append("\n");
+            message.append("Is Restricted: ").append((Config.RESTRICT_REPAIRS.get() && !isRestrictedItem(stack.getItem()))).append("\n");
             message.append("Class hierarchy: ").append(stack.getItem().getClass().toString()).append("\n");
             Set<Class<?>> classes = DebugHelper.getAllExtendedOrImplementedTypesRecursively(stack.getItem().getClass());
             for (Class<?> clazz : classes) {
@@ -110,7 +116,7 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
 
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         if (this.level.getBlockEntity(this.worldPosition) != this) {
             return false;
         } else {
@@ -119,18 +125,18 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
     }
 
     @Override
-    public void load(BlockState blockState, CompoundNBT compound) {
-        super.load(blockState, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         this.itemStorage = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         this.setAutoEject(compound.getBoolean("autoEject"));
-        ItemStackHelper.loadAllItems(compound, this.itemStorage);
+        ContainerHelper.loadAllItems(compound, this.itemStorage);
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
-        ItemStackHelper.saveAllItems(compound, this.itemStorage);
+    public void saveAdditional(CompoundTag compound) {
+        ContainerHelper.saveAllItems(compound, this.itemStorage);
         compound.putBoolean("autoEject", this.isAutoEject());
-        return super.save(compound);
+        super.saveAdditional(compound);
     }
 
     @Override
@@ -146,12 +152,12 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
                 ejectItem();
             }
         }
-        super.func_73660_a();
+        super.tick();
 
     }
 
     private void ejectItem() {
-        if (InventoryHelper.addToPriorityInventory(this.getLevel(), this.worldPosition, getItem(0).copy(), InventoryHelper.getSideList(this.worldPosition, this.getBlockState().getValue(BlockStateProperties.FACING)))) {
+        if (InventoryHelper.addToPriorityInventory(this.getLevel(), this.worldPosition, getItem(0).copy(), InventoryHelper.getSideList(this.worldPosition, this.getBlockState().getValue(BlockRecon.FACING)))) {
             this.removeItem(0, 1);
         }
     }
@@ -162,9 +168,9 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
         ItemStack stack = this.getItem(0);
         int repairAmount = Config.SCALED_REPAIR.get() ? Math.max(1, (stack.getMaxDamage()/1000)) : 1;
         stack.setDamageValue(stack.getDamageValue() - repairAmount);
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("Stats")) {
-            CompoundNBT stats = tag.getCompound("Stats");
+            CompoundTag stats = tag.getCompound("Stats");
             stats.putBoolean("Broken",false);
             tag.put("Stats", stats);
             stack.setTag(tag);
@@ -181,13 +187,7 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
                 ) ||
                 Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId()) ||
                 (
-                        Config.RESTRICT_REPAIRS.get() &&
-                        !(
-                                stack.getItem() instanceof ToolItem ||
-                                stack.getItem() instanceof ArmorItem ||
-                                stack.getItem() instanceof SwordItem ||
-                                stack.getItem() instanceof BowItem
-                        )
+                        Config.RESTRICT_REPAIRS.get() && !this.isRestrictedItem(stack.getItem())
                 );
     }
 
@@ -198,6 +198,18 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
             }
         }
         return false;
+    }
+
+    private boolean isRestrictedItem(Item item) {
+        return
+                (item instanceof DiggerItem ||
+                item instanceof ShearsItem ||
+                item instanceof FishingRodItem ||
+                item instanceof ArmorItem ||
+                item instanceof ElytraItem ||
+                item instanceof SwordItem ||
+                item instanceof ShieldItem ||
+                item instanceof BowItem);
     }
 
     @Nonnull
@@ -240,5 +252,15 @@ public class TileRecon extends TileEntityPowered implements ISidedInventory {
     public void setAutoEject(boolean newValue) {
         this.autoEject = newValue;
         this.setChanged();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
+        return new ContainerRecon(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return new TextComponent("block.reconstructor.reconstructor");
     }
 }

@@ -5,16 +5,16 @@ import com.mcupdater.mculib.inventory.ArmorSlotItemHandler;
 import com.mcupdater.mculib.inventory.PlayerBypassItemHandler;
 import com.mcupdater.mculib.inventory.PlayerPrioritySlotItemHandler;
 import com.mcupdater.reconstructor.setup.Registration;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -22,14 +22,14 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class ContainerRecon extends ContainerPowered {
     private TileRecon localTileEntity;
-    private PlayerEntity playerEntity;
+    private Player playerEntity;
     private IItemHandler playerInventory;
 
-    public final IntReferenceHolder data;
+    public final DataSlot data;
 
-    private static final EquipmentSlotType[] VALID_EQUIPMENT_SLOTS = new EquipmentSlotType[] {EquipmentSlotType.HEAD, EquipmentSlotType.CHEST, EquipmentSlotType.LEGS, EquipmentSlotType.FEET, EquipmentSlotType.OFFHAND};
+    private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
-    public ContainerRecon(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player, IntReferenceHolder localData) {
+    public ContainerRecon(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, DataSlot localData) {
         super(Registration.RECONBLOCK_CONTAINER.get(), windowId);
         localTileEntity = world.getBlockEntity(pos) instanceof TileRecon ? (TileRecon) world.getBlockEntity(pos) : null;
         tileEntity = localTileEntity;
@@ -74,19 +74,19 @@ public class ContainerRecon extends ContainerPowered {
 
         for (int i = 0; i < 4; ++i)
         {
-            final EquipmentSlotType entityequipmentslot = VALID_EQUIPMENT_SLOTS[i];
+            final EquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[i];
             addSlot(new ArmorSlotItemHandler(playerInventory, 36 + (3 - i), 8, 8 + i * 18, entityequipmentslot, playerEntity));
         }
-        this.addSlot(new SlotItemHandler(playerInventory, 40, 26, 62).setBackground(PlayerContainer.BLOCK_ATLAS, PlayerContainer.EMPTY_ARMOR_SLOT_SHIELD));
+        this.addSlot(new SlotItemHandler(playerInventory, 40, 26, 62).setBackground(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD));
     }
 
     @Override
-    public boolean stillValid(PlayerEntity playerIn) {
-        return stillValid(IWorldPosCallable.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONBLOCK.get());
+    public boolean stillValid(Player playerIn) {
+        return stillValid(ContainerLevelAccess.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONBLOCK.get());
     }
 
     @Override
-    public ItemStack quickMoveStack(PlayerEntity playerEntity, int index) {
+    public ItemStack quickMoveStack(Player playerEntity, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot != null && slot.hasItem()) {

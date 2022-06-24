@@ -25,7 +25,4 @@ public class Reconstructor
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ModSetup::init);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
     }
-
-
-
 }
