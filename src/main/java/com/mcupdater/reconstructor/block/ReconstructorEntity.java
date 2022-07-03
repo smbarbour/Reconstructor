@@ -1,6 +1,6 @@
-package com.mcupdater.reconstructor.tile;
+package com.mcupdater.reconstructor.block;
 
-import com.mcupdater.mculib.capabilities.TileEntityPowered;
+import com.mcupdater.mculib.block.MachineBlockEntity;
 import com.mcupdater.mculib.helpers.DebugHelper;
 import com.mcupdater.mculib.helpers.InventoryHelper;
 import com.mcupdater.reconstructor.Reconstructor;
@@ -20,7 +20,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -32,9 +31,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Set;
 
-import static com.mcupdater.reconstructor.setup.Registration.RECONBLOCK_TILE;
+import static com.mcupdater.reconstructor.setup.Registration.RECONSTRUCTOR_ENTITY;
 
-public class TileRecon extends TileEntityPowered implements WorldlyContainer, MenuProvider {
+public class ReconstructorEntity extends MachineBlockEntity implements WorldlyContainer, MenuProvider {
     protected NonNullList<ItemStack> itemStorage = NonNullList.withSize(1, ItemStack.EMPTY);
     private boolean autoEject = false;
 
@@ -52,8 +51,8 @@ public class TileRecon extends TileEntityPowered implements WorldlyContainer, Me
         }
     };
 
-    public TileRecon(BlockPos blockPos, BlockState blockState ) {
-        super(RECONBLOCK_TILE.get(), blockPos, blockState,Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE);
+    public ReconstructorEntity(BlockPos blockPos, BlockState blockState ) {
+        super(RECONSTRUCTOR_ENTITY.get(), blockPos, blockState,Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE, ReceiveMode.ACCEPTS, SendMode.SHARE, Config.ENERGY_PER_POINT.get());
     }
 
     @Override
@@ -109,7 +108,7 @@ public class TileRecon extends TileEntityPowered implements WorldlyContainer, Me
             for (Class<?> clazz : classes) {
                 message.append("  ").append(clazz.getName()).append("\n");
             }
-            Reconstructor.LOGGER.log(Level.INFO, message.toString());
+            Reconstructor.LOGGER.info(message.toString());
         }
         return stack.isDamageableItem() || isWhitelisted(stack.getItem().getClass().toString());
     }
@@ -141,28 +140,22 @@ public class TileRecon extends TileEntityPowered implements WorldlyContainer, Me
 
     @Override
     public void tick() {
+        super.tick();
         if (!level.isClientSide) {
-            if (Config.ENERGY_PER_POINT.get() == 0 || energyStorage.getEnergyStored() > Config.ENERGY_PER_POINT.get()) {
-                if (tryRepair()) {
-                    energyStorage.extractEnergy(Config.ENERGY_PER_POINT.get(), false);
-                    this.setChanged();
-                }
-            }
             if (autoEject && isExtractable(this.getItem(0))) {
                 ejectItem();
             }
         }
-        super.tick();
-
     }
 
     private void ejectItem() {
-        if (InventoryHelper.addToPriorityInventory(this.getLevel(), this.worldPosition, getItem(0).copy(), InventoryHelper.getSideList(this.worldPosition, this.getBlockState().getValue(BlockRecon.FACING)))) {
+        if (InventoryHelper.addToPriorityInventory(this.getLevel(), this.worldPosition, getItem(0).copy(), InventoryHelper.getSideList(this.worldPosition, this.getBlockState().getValue(ReconstructorBlock.FACING)))) {
             this.removeItem(0, 1);
         }
     }
 
-    private boolean tryRepair() {
+    @Override
+    protected boolean performWork() {
         if (this.getItem(0).isEmpty() || !this.getItem(0).isDamaged())
             return false;
         ItemStack stack = this.getItem(0);
@@ -256,7 +249,7 @@ public class TileRecon extends TileEntityPowered implements WorldlyContainer, Me
 
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
-        return new ContainerRecon(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data);
+        return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data);
     }
 
     @Override

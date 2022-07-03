@@ -1,6 +1,6 @@
 package com.mcupdater.reconstructor.network;
 
-import com.mcupdater.reconstructor.tile.TileRecon;
+import com.mcupdater.reconstructor.block.ReconstructorEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -26,9 +26,9 @@ public class AutoEjectPacket {
     public static void handle(AutoEjectPacket msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Level level = ctx.get().getSender().level;
-            if (level.getBlockEntity(msg.blockPos) instanceof TileRecon) {
-                TileRecon tileRecon = (TileRecon) level.getBlockEntity(msg.blockPos);
-                tileRecon.data.set(tileRecon.data.get()-1);
+            if (level.getBlockEntity(msg.blockPos) instanceof ReconstructorEntity) {
+                ReconstructorEntity reconstructorEntity = (ReconstructorEntity) level.getBlockEntity(msg.blockPos);
+                reconstructorEntity.data.set(reconstructorEntity.data.get()-1);
             }
         });
         ctx.get().setPacketHandled(true);

@@ -9,10 +9,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Reconstructor.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModSetup {
+
     public static final CreativeModeTab ITEM_GROUP = new CreativeModeTab("reconstructor") {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(Registration.RECONBLOCK.get());
+            return new ItemStack(Registration.RECONSTRUCTOR_BLOCK.get());
         }
     };
 

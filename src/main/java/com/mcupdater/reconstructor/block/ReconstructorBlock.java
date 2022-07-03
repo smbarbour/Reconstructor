@@ -1,4 +1,4 @@
-package com.mcupdater.reconstructor.tile;
+package com.mcupdater.reconstructor.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,10 +27,10 @@ import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class BlockRecon extends BaseEntityBlock {
+public class ReconstructorBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public BlockRecon() {
+    public ReconstructorBlock() {
         super(Properties.of(Material.METAL).sound(SoundType.METAL).strength(11.0f));
 
         registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
@@ -39,7 +39,7 @@ public class BlockRecon extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState state) {
-        return new TileRecon(blockPos, state);
+        return new ReconstructorEntity(blockPos, state);
     }
 
     @Nullable
@@ -64,7 +64,7 @@ public class BlockRecon extends BaseEntityBlock {
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult trace) {
         if (!world.isClientSide) {
             BlockEntity tileEntity = world.getBlockEntity(pos);
-            if (tileEntity instanceof TileRecon) {
+            if (tileEntity instanceof ReconstructorEntity) {
                 NetworkHooks.openGui((ServerPlayer) player, (MenuProvider) tileEntity, pos);
             } else {
                 return InteractionResult.FAIL;
@@ -79,8 +79,8 @@ public class BlockRecon extends BaseEntityBlock {
         if (oldState.getBlock() != newState.getBlock()) {
             BlockEntity tile = world.getBlockEntity(blockPos);
 
-            if (tile instanceof TileRecon) {
-                Containers.dropContents(world, blockPos, (TileRecon) tile);
+            if (tile instanceof ReconstructorEntity) {
+                Containers.dropContents(world, blockPos, (ReconstructorEntity) tile);
                 world.updateNeighbourForOutputSignal(blockPos, this);
             }
         }
@@ -89,7 +89,7 @@ public class BlockRecon extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
         return (lvl, pos, state, tile) -> {
-            if (tile instanceof TileRecon recon) {
+            if (tile instanceof ReconstructorEntity recon) {
                 recon.tick();
             }
         };

@@ -1,4 +1,4 @@
-package com.mcupdater.reconstructor.tile;
+package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.gui.WidgetPower;
 import com.mcupdater.reconstructor.Reconstructor;
@@ -16,11 +16,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class ScreenRecon extends AbstractContainerScreen<ContainerRecon> {
+public class ReconstructorScreen extends AbstractContainerScreen<ReconstructorMenu> {
     private ResourceLocation GUI = new ResourceLocation(Reconstructor.MODID, "textures/gui/recon.png");
     private Button btnAutoEject;
 
-    public ScreenRecon(ContainerRecon container, Inventory inv, Component name) {
+    public ReconstructorScreen(ReconstructorMenu container, Inventory inv, Component name) {
         super(container, inv, name);
     }
 

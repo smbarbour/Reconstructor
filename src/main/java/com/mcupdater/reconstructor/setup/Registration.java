@@ -1,8 +1,8 @@
 package com.mcupdater.reconstructor.setup;
 
-import com.mcupdater.reconstructor.tile.BlockRecon;
-import com.mcupdater.reconstructor.tile.ContainerRecon;
-import com.mcupdater.reconstructor.tile.TileRecon;
+import com.mcupdater.reconstructor.block.ReconstructorBlock;
+import com.mcupdater.reconstructor.block.ReconstructorEntity;
+import com.mcupdater.reconstructor.block.ReconstructorMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -31,13 +31,13 @@ public class Registration {
         CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
-    public static final RegistryObject<BlockRecon> RECONBLOCK = BLOCKS.register("reconstructor", BlockRecon::new);
-    public static final RegistryObject<Item> RECONBLOCK_ITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONBLOCK.get(), new Item.Properties().tab(ModSetup.ITEM_GROUP)));
-    public static final RegistryObject<BlockEntityType<TileRecon>> RECONBLOCK_TILE = TILES.register("reconstructor", () -> BlockEntityType.Builder.of(TileRecon::new, RECONBLOCK.get()).build(null));
-    public static final RegistryObject<MenuType<ContainerRecon>> RECONBLOCK_CONTAINER = CONTAINERS.register("reconstructor", () -> IForgeMenuType.create((windowId, inv, data) -> {
+    public static final RegistryObject<ReconstructorBlock> RECONSTRUCTOR_BLOCK = BLOCKS.register("reconstructor", ReconstructorBlock::new);
+    public static final RegistryObject<Item> RECONSTRUCTOR_BLOCKITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONSTRUCTOR_BLOCK.get(), new Item.Properties().tab(ModSetup.ITEM_GROUP)));
+    public static final RegistryObject<BlockEntityType<ReconstructorEntity>> RECONSTRUCTOR_ENTITY = TILES.register("reconstructor", () -> BlockEntityType.Builder.of(ReconstructorEntity::new, RECONSTRUCTOR_BLOCK.get()).build(null));
+    public static final RegistryObject<MenuType<ReconstructorMenu>> RECONSTRUCTOR_MENU = CONTAINERS.register("reconstructor", () -> IForgeMenuType.create((windowId, inv, data) -> {
         BlockPos pos = data.readBlockPos();
         Level world = inv.player.level;
-        TileRecon te = (TileRecon) world.getBlockEntity(pos);
-        return new ContainerRecon(windowId, world, pos, inv, inv.player, te.data);
+        ReconstructorEntity te = (ReconstructorEntity) world.getBlockEntity(pos);
+        return new ReconstructorMenu(windowId, world, pos, inv, inv.player, te.data);
     }));
 }

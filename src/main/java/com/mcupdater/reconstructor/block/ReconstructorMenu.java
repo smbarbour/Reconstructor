@@ -1,9 +1,8 @@
-package com.mcupdater.reconstructor.tile;
+package com.mcupdater.reconstructor.block;
 
-import com.mcupdater.mculib.capabilities.ContainerPowered;
+import com.mcupdater.mculib.capabilities.PowerTrackingMenu;
 import com.mcupdater.mculib.inventory.ArmorSlotItemHandler;
-import com.mcupdater.mculib.inventory.PlayerBypassItemHandler;
-import com.mcupdater.mculib.inventory.PlayerPrioritySlotItemHandler;
+import com.mcupdater.mculib.inventory.MachineInputSlot;
 import com.mcupdater.reconstructor.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -15,13 +14,12 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-public class ContainerRecon extends ContainerPowered {
-    private TileRecon localTileEntity;
+public class ReconstructorMenu extends PowerTrackingMenu {
+    private ReconstructorEntity localTileEntity;
     private Player playerEntity;
     private IItemHandler playerInventory;
 
@@ -29,18 +27,16 @@ public class ContainerRecon extends ContainerPowered {
 
     private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
-    public ContainerRecon(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, DataSlot localData) {
-        super(Registration.RECONBLOCK_CONTAINER.get(), windowId);
-        localTileEntity = world.getBlockEntity(pos) instanceof TileRecon ? (TileRecon) world.getBlockEntity(pos) : null;
+    public ReconstructorMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, DataSlot localData) {
+        super(Registration.RECONSTRUCTOR_MENU.get(), windowId);
+        localTileEntity = world.getBlockEntity(pos) instanceof ReconstructorEntity ? (ReconstructorEntity) world.getBlockEntity(pos) : null;
         tileEntity = localTileEntity;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
         this.data = localData;
 
         if (localTileEntity != null) {
-            localTileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
-                addSlot(new PlayerPrioritySlotItemHandler(new PlayerBypassItemHandler(h, localTileEntity), 0, 80, 41));
-            });
+            addSlot(new MachineInputSlot(localTileEntity, new InvWrapper(localTileEntity), 0, 80, 41));
         }
         layoutPlayerInventorySlots(8,84);
         trackPower();
@@ -82,7 +78,7 @@ public class ContainerRecon extends ContainerPowered {
 
     @Override
     public boolean stillValid(Player playerIn) {
-        return stillValid(ContainerLevelAccess.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONBLOCK.get());
+        return stillValid(ContainerLevelAccess.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONSTRUCTOR_BLOCK.get());
     }
 
     @Override
@@ -127,7 +123,7 @@ public class ContainerRecon extends ContainerPowered {
         return itemstack;
     }
 
-    public TileRecon getBlockEntity() {
+    public ReconstructorEntity getBlockEntity() {
         return localTileEntity;
     }
 }

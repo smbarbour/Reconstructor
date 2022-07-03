@@ -12,6 +12,6 @@ Repair your stuff using Forge Energy
 [[dependencies.reconstructor]]
     modId="mculib"
     mandatory=true
-    versionRange="[1.0,)"
+    versionRange="[1.2,)"
     ordering="NONE"
     side="BOTH"
