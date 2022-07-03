@@ -83,6 +83,7 @@ public class ReconstructorBlock extends BaseEntityBlock {
                 Containers.dropContents(world, blockPos, (ReconstructorEntity) tile);
                 world.updateNeighbourForOutputSignal(blockPos, this);
             }
+            super.onRemove(oldState, world, blockPos, newState, flag);
         }
     }
 

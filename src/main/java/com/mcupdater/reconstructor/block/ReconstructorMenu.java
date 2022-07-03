@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -89,21 +90,30 @@ public class ReconstructorMenu extends PowerTrackingMenu {
             ItemStack stack = slot.getItem();
             itemstack = stack.copy();
             if (index == 0) {
-                if (!this.moveItemStackTo(stack, 1, this.getItems().size(), true)) {
+                boolean itemNotMoved = true;
+                if (stack.getItem() instanceof ShieldItem) { // If shield, try to place in offhand
+                    itemNotMoved = !this.moveItemStackTo(stack,41,this.getItems().size(),false);
+                }
+                // Place in inventory starting with armor slots first, then hotbar, then regular inventory (true means reverse order)
+                if (itemNotMoved && !this.moveItemStackTo(stack, 1, this.getItems().size()-1, true)) {
                     return ItemStack.EMPTY;
                 }
                 slot.onQuickCraft(stack, itemstack);
             } else {
-                if (this.localTileEntity.canPlaceItem(0, stack)) {
+                // Move to repair slot if possible
+                if (this.localTileEntity.itemStorage.get(0).isEmpty() && this.localTileEntity.canPlaceItem(0, stack)) {
                     if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else
-                if (index < 29) {
-                    if (!this.moveItemStackTo(stack, 29, 37, false)) {
+                } else if (index < 28) {
+                    // Move regular inventory to hotbar
+                    if (!this.moveItemStackTo(stack, 28, 37, false)) {
                         return ItemStack.EMPTY;
                     }
+                    // Move hotbar to regular inventory
                 } else if (index < 38 && !this.moveItemStackTo(stack, 1, 29, false)) {
+                    return ItemStack.EMPTY;
+                } else if (!this.moveItemStackTo(stack,1, 37,false)) { //Move armor to regular inventory or hotbar
                     return ItemStack.EMPTY;
                 }
             }

@@ -1,5 +1,6 @@
 package com.mcupdater.reconstructor.setup;
 
+import com.mcupdater.mculib.setup.ModSetup;
 import com.mcupdater.reconstructor.block.ReconstructorBlock;
 import com.mcupdater.reconstructor.block.ReconstructorEntity;
 import com.mcupdater.reconstructor.block.ReconstructorMenu;
@@ -32,7 +33,7 @@ public class Registration {
     }
 
     public static final RegistryObject<ReconstructorBlock> RECONSTRUCTOR_BLOCK = BLOCKS.register("reconstructor", ReconstructorBlock::new);
-    public static final RegistryObject<Item> RECONSTRUCTOR_BLOCKITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONSTRUCTOR_BLOCK.get(), new Item.Properties().tab(ModSetup.ITEM_GROUP)));
+    public static final RegistryObject<Item> RECONSTRUCTOR_BLOCKITEM = ITEMS.register("reconstructor", () -> new BlockItem(RECONSTRUCTOR_BLOCK.get(), new Item.Properties().tab(ModSetup.MCULIB_ITEM_GROUP)));
     public static final RegistryObject<BlockEntityType<ReconstructorEntity>> RECONSTRUCTOR_ENTITY = TILES.register("reconstructor", () -> BlockEntityType.Builder.of(ReconstructorEntity::new, RECONSTRUCTOR_BLOCK.get()).build(null));
     public static final RegistryObject<MenuType<ReconstructorMenu>> RECONSTRUCTOR_MENU = CONTAINERS.register("reconstructor", () -> IForgeMenuType.create((windowId, inv, data) -> {
         BlockPos pos = data.readBlockPos();

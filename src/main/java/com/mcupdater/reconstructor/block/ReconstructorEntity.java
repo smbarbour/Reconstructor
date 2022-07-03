@@ -91,6 +91,7 @@ public class ReconstructorEntity extends MachineBlockEntity implements WorldlyCo
         if (stack.getCount() > this.getMaxStackSize()) {
             stack.setCount(this.getMaxStackSize());
         }
+        this.setChanged();
     }
 
     @Override
