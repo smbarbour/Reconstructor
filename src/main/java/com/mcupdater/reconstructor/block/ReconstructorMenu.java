@@ -1,85 +1,55 @@
 package com.mcupdater.reconstructor.block;
 
-import com.mcupdater.mculib.capabilities.PowerTrackingMenu;
+import com.mcupdater.mculib.block.AbstractMachineMenu;
 import com.mcupdater.mculib.inventory.ArmorSlotItemHandler;
 import com.mcupdater.mculib.inventory.MachineInputSlot;
 import com.mcupdater.reconstructor.setup.Registration;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-public class ReconstructorMenu extends PowerTrackingMenu {
-    private ReconstructorEntity localTileEntity;
-    private Player playerEntity;
-    private IItemHandler playerInventory;
+import java.util.Map;
 
-    public final DataSlot data;
+public class ReconstructorMenu extends AbstractMachineMenu<ReconstructorEntity> {
 
     private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
-    public ReconstructorMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, DataSlot localData) {
-        super(Registration.RECONSTRUCTOR_MENU.get(), windowId);
-        localTileEntity = world.getBlockEntity(pos) instanceof ReconstructorEntity ? (ReconstructorEntity) world.getBlockEntity(pos) : null;
-        tileEntity = localTileEntity;
-        this.playerEntity = player;
-        this.playerInventory = new InvWrapper(playerInventory);
-        this.data = localData;
-
-        if (localTileEntity != null) {
-            addSlot(new MachineInputSlot(localTileEntity, new InvWrapper(localTileEntity), 0, 80, 41));
-        }
-        layoutPlayerInventorySlots(8,84);
-        trackPower();
-        addDataSlot(this.data);
+    public ReconstructorMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, ContainerData data, Map<Direction, Component> directionComponentMap) {
+        super((ReconstructorEntity) world.getBlockEntity(pos),Registration.RECONSTRUCTOR_MENU.get(), windowId, world, pos, playerInventory, player, data, directionComponentMap);
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
-        for (int i = 0 ; i < amount ; i++) {
-            addSlot(new SlotItemHandler(handler, index, x, y));
-            x += dx;
-            index++;
-        }
-        return index;
+    @Override
+    protected void addMachineSlots() {
+        addSlot(new MachineInputSlot(this.machineEntity, new InvWrapper(this.machineEntity), 0, 80, 41));
     }
 
-    private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
-        for (int j = 0 ; j < verAmount ; j++) {
-            index = addSlotRange(handler, index, x, y, horAmount, dx);
-            y += dy;
-        }
-        return index;
-    }
-
-    private void layoutPlayerInventorySlots(int leftCol, int topRow) {
-        // Player inventory
-        addSlotBox(playerInventory, 9, leftCol, topRow, 9, 18, 3, 18);
-
-        // Hotbar
-        topRow += 58;
-        addSlotRange(playerInventory, 0, leftCol, topRow, 9, 18);
+    @Override
+    protected void layoutPlayerInventorySlots(int leftCol, int topRow) {
+        super.layoutPlayerInventorySlots(leftCol, topRow);
 
         for (int i = 0; i < 4; ++i)
         {
             final EquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[i];
-            addSlot(new ArmorSlotItemHandler(playerInventory, 36 + (3 - i), 8, 8 + i * 18, entityequipmentslot, playerEntity));
+            addSlot(new ArmorSlotItemHandler(playerInventory, 36 + (3 - i), 8, 8 + i * 18, entityequipmentslot, this.player));
         }
         this.addSlot(new SlotItemHandler(playerInventory, 40, 26, 62).setBackground(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD));
     }
 
     @Override
     public boolean stillValid(Player playerIn) {
-        return stillValid(ContainerLevelAccess.create(localTileEntity.getLevel(), localTileEntity.getBlockPos()), playerEntity, Registration.RECONSTRUCTOR_BLOCK.get());
+        return stillValid(ContainerLevelAccess.create(this.machineEntity.getLevel(), this.machineEntity.getBlockPos()), playerIn, Registration.RECONSTRUCTOR_BLOCK.get());
     }
 
     @Override
@@ -101,7 +71,7 @@ public class ReconstructorMenu extends PowerTrackingMenu {
                 slot.onQuickCraft(stack, itemstack);
             } else {
                 // Move to repair slot if possible
-                if (this.localTileEntity.itemStorage.get(0).isEmpty() && this.localTileEntity.canPlaceItem(0, stack)) {
+                if (this.machineEntity.itemStorage.get(0).isEmpty() && this.machineEntity.canPlaceItem(0, stack)) {
                     if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -133,7 +103,4 @@ public class ReconstructorMenu extends PowerTrackingMenu {
         return itemstack;
     }
 
-    public ReconstructorEntity getBlockEntity() {
-        return localTileEntity;
-    }
 }

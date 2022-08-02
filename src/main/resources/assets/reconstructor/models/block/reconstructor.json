@@ -1,11 +1,11 @@
 {
 	"parent": "mculib:block/machine",
 	"textures": {
-		"frame": "minecraft:block/iron_block",
-		"corner": "minecraft:block/iron_block",
+		"frame": "minecraft:block/copper_block",
+		"corner": "minecraft:block/copper_block",
 		"face": "minecraft:block/iron_block",
 		"inset": "minecraft:block/black_concrete",
 		"overlay": "reconstructor:blocks/hammer",
-		"particle": "minecraft:block/iron_block"
+		"particle": "minecraft:block/copper_block"
 	}
 }

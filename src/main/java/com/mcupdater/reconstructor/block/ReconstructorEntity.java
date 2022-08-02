@@ -1,6 +1,7 @@
 package com.mcupdater.reconstructor.block;
 
-import com.mcupdater.mculib.block.MachineBlockEntity;
+import com.mcupdater.mculib.block.AbstractMachineBlockEntity;
+import com.mcupdater.mculib.helpers.DataHelper;
 import com.mcupdater.mculib.helpers.DebugHelper;
 import com.mcupdater.mculib.helpers.InventoryHelper;
 import com.mcupdater.reconstructor.Reconstructor;
@@ -10,14 +11,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -25,7 +24,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
-import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,21 +31,26 @@ import java.util.Set;
 
 import static com.mcupdater.reconstructor.setup.Registration.RECONSTRUCTOR_ENTITY;
 
-public class ReconstructorEntity extends MachineBlockEntity implements WorldlyContainer, MenuProvider {
+public class ReconstructorEntity extends AbstractMachineBlockEntity {
     protected NonNullList<ItemStack> itemStorage = NonNullList.withSize(1, ItemStack.EMPTY);
     private boolean autoEject = false;
 
     private final LazyOptional<IItemHandlerModifiable>[] itemHandler = SidedInvWrapper.create(this, Direction.values());
 
-    public DataSlot data = new DataSlot() {
+    public ContainerData data = new ContainerData() {
         @Override
-        public int get() {
+        public int get(int index) {
             return isAutoEject() ? 1 : 0;
         }
 
         @Override
-        public void set(int newValue) {
+        public void set(int index, int newValue) {
             setAutoEject(newValue != 0);
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
         }
     };
 
@@ -250,11 +253,11 @@ public class ReconstructorEntity extends MachineBlockEntity implements WorldlyCo
 
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
-        return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data);
+        return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data, DataHelper.getAdjacentNames(this.level, this.worldPosition));
     }
 
     @Override
-    public Component getDisplayName() {
-        return new TextComponent("block.reconstructor.reconstructor");
+    protected Component getDefaultName() {
+        return new TranslatableComponent("block.reconstructor.reconstructor");
     }
 }

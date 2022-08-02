@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CFC",
+    "F#F",
+    "CFC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "F": {
+      "item": "minecraft:iron_ingot"
+    },
+    "#": {
+      "item": "minecraft:grindstone"
+    }
+  },
+  "result": {
+    "item": "reconstructor:reconstructor"
+  }
+}

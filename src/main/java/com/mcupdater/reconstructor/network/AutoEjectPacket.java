@@ -28,7 +28,7 @@ public class AutoEjectPacket {
             Level level = ctx.get().getSender().level;
             if (level.getBlockEntity(msg.blockPos) instanceof ReconstructorEntity) {
                 ReconstructorEntity reconstructorEntity = (ReconstructorEntity) level.getBlockEntity(msg.blockPos);
-                reconstructorEntity.data.set(reconstructorEntity.data.get()-1);
+                reconstructorEntity.data.set(0,reconstructorEntity.data.get(0)-1);
             }
         });
         ctx.get().setPacketHandled(true);

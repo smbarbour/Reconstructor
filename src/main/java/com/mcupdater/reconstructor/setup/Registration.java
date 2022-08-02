@@ -1,5 +1,6 @@
 package com.mcupdater.reconstructor.setup;
 
+import com.mcupdater.mculib.helpers.DataHelper;
 import com.mcupdater.mculib.setup.ModSetup;
 import com.mcupdater.reconstructor.block.ReconstructorBlock;
 import com.mcupdater.reconstructor.block.ReconstructorEntity;
@@ -39,6 +40,6 @@ public class Registration {
         BlockPos pos = data.readBlockPos();
         Level world = inv.player.level;
         ReconstructorEntity te = (ReconstructorEntity) world.getBlockEntity(pos);
-        return new ReconstructorMenu(windowId, world, pos, inv, inv.player, te.data);
+        return new ReconstructorMenu(windowId, world, pos, inv, inv.player, te.data, DataHelper.readDirectionMap(data));
     }));
 }
