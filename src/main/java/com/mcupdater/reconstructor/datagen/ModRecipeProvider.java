@@ -20,6 +20,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildCraftingRecipes(@NotNull Consumer<FinishedRecipe> finishedRecipeConsumer) {
-        ShapedRecipeBuilder.shaped(Registration.RECONSTRUCTOR_BLOCK.get()).define('C', Ingredient.of(Items.COPPER_INGOT)).define('F',Ingredient.of(Items.IRON_INGOT)).define('#', Ingredient.of(Blocks.GRINDSTONE)).pattern("CFC").pattern("F#F").pattern("CFC").unlockedBy("has_copper", has(Items.COPPER_INGOT)).save(finishedRecipeConsumer);
+        ShapedRecipeBuilder.shaped(Registration.RECONSTRUCTOR_BLOCK.get()).define('C', Ingredient.of(Items.COPPER_INGOT)).define('F',Ingredient.of(Items.IRON_INGOT)).define('#', Ingredient.of(Blocks.GRINDSTONE)).define('R', Ingredient.of(Items.REDSTONE)).pattern("CFC").pattern("F#F").pattern("CRC").unlockedBy("has_copper", has(Items.COPPER_INGOT)).save(finishedRecipeConsumer);
     }
 }

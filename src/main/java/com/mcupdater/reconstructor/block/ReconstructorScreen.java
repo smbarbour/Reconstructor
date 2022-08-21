@@ -35,7 +35,9 @@ public class ReconstructorScreen extends AbstractMachineScreen<ReconstructorEnti
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         // Do not draw normal container labels
-        btnAutoEject.setMessage(new TextComponent("Auto-eject: " + (menu.getBlockEntity().isAutoEject() ? "ON" : "OFF")));
+        if (menu.getBlockEntity() instanceof ReconstructorEntity blockEntity) {
+            btnAutoEject.setMessage(new TextComponent("Auto-eject: " + (blockEntity.isAutoEject() ? "ON" : "OFF")));
+        }
     }
 
     //renderBackground

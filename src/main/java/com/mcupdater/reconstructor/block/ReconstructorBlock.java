@@ -1,6 +1,7 @@
 package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineBlock;
+import com.mcupdater.mculib.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,8 +38,9 @@ public class ReconstructorBlock extends AbstractMachineBlock {
             double x = (double) pPos.getX() + 0.5D;
             double y = (double) pPos.getY();
             double z = (double) pPos.getZ() + 0.5D;
-            if (pRandom.nextDouble() < 0.15D) {
-                pLevel.playLocalSound(x, y, z, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+            pLevel.playLocalSound(x, y, z, Registration.MACHINE_HUM.get(), SoundSource.BLOCKS, 1.0F, 1.0F, false);
+            if (pRandom.nextDouble() < 0.1D) {
+                pLevel.playLocalSound(x, y, z, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
 
             Direction direction = pState.getValue(FACING);

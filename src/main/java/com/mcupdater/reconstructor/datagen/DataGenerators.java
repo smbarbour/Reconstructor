@@ -16,5 +16,6 @@ public class DataGenerators {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         dataGenerator.addProvider(new ModRecipeProvider(dataGenerator));
+        dataGenerator.addProvider(new ModBlockTagsProvider(dataGenerator, Reconstructor.MODID, existingFileHelper));
     }
 }
