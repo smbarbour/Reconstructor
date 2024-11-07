@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[41,)"
 license="Apache License 2.0"
 [[mods]]
 modId="reconstructor"
@@ -12,6 +12,6 @@ Repair your stuff using Forge Energy
 [[dependencies.reconstructor]]
     modId="mculib"
     mandatory=true
-    versionRange="[1.2,)"
+    versionRange="[1.4,)"
     ordering="NONE"
     side="BOTH"

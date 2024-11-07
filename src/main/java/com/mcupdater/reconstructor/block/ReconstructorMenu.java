@@ -32,7 +32,7 @@ public class ReconstructorMenu extends AbstractMachineMenu<ReconstructorEntity> 
 
     @Override
     protected void addMachineSlots() {
-        addSlot(new MachineInputSlot(this.machineEntity, new InvWrapper(this.machineEntity), 0, 80, 41));
+        addSlot(new MachineInputSlot(this.machineEntity, new InvWrapper(this.machineEntity.getInventory()), 0, 80, 41));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ReconstructorMenu extends AbstractMachineMenu<ReconstructorEntity> 
                 slot.onQuickCraft(stack, itemstack);
             } else {
                 // Move to repair slot if possible
-                if (this.machineEntity.itemStorage.get(0).isEmpty() && this.machineEntity.canPlaceItem(0, stack)) {
+                if (this.machineEntity.getInventory().getItem(0).isEmpty() && this.machineEntity.canPlaceItem(0, stack)) {
                     if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }

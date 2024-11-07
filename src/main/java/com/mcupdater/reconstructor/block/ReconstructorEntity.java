@@ -1,103 +1,36 @@
 package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineBlockEntity;
+import com.mcupdater.mculib.capabilities.EnergyResourceHandler;
+import com.mcupdater.mculib.capabilities.ItemResourceHandler;
 import com.mcupdater.mculib.helpers.DataHelper;
 import com.mcupdater.mculib.helpers.DebugHelper;
-import com.mcupdater.mculib.helpers.InventoryHelper;
 import com.mcupdater.reconstructor.Reconstructor;
 import com.mcupdater.reconstructor.setup.Config;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Set;
 
 import static com.mcupdater.reconstructor.setup.Registration.RECONSTRUCTOR_ENTITY;
 
 public class ReconstructorEntity extends AbstractMachineBlockEntity {
-    protected NonNullList<ItemStack> itemStorage = NonNullList.withSize(1, ItemStack.EMPTY);
-    private boolean autoEject = false;
 
-    private final LazyOptional<IItemHandlerModifiable>[] itemHandler = SidedInvWrapper.create(this, Direction.values());
-
-    public ContainerData data = new ContainerData() {
-        @Override
-        public int get(int index) {
-            return isAutoEject() ? 1 : 0;
-        }
-
-        @Override
-        public void set(int index, int newValue) {
-            setAutoEject(newValue != 0);
-        }
-
-        @Override
-        public int getCount() {
-            return 1;
-        }
-    };
-
-    public ReconstructorEntity(BlockPos blockPos, BlockState blockState ) {
-        super(RECONSTRUCTOR_ENTITY.get(), blockPos, blockState,Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE, ReceiveMode.ACCEPTS, SendMode.SHARE, Config.ENERGY_PER_POINT.get());
+    public ReconstructorEntity(BlockPos blockPos, BlockState blockState) {
+        super(RECONSTRUCTOR_ENTITY.get(), blockPos, blockState, Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), Integer.MAX_VALUE, Config.ENERGY_PER_POINT.get(), 1);
+        ItemResourceHandler itemResourceHandler = new ItemResourceHandler(this.level, 1, new int[]{0}, new int[]{0}, new int[]{0}, this::stillValid);
+        itemResourceHandler.setInsertFunction(this::canPlaceItem);
+        itemResourceHandler.setExtractFunction(this::canTakeItem);
+        this.configMap.put("items", itemResourceHandler);
     }
 
-    @Override
-    public int getContainerSize() {
-        return this.itemStorage.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        for(ItemStack itemstack : this.itemStorage) {
-            if (!itemstack.isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;    }
-
-    @Override
-    public ItemStack getItem(int index) {
-        return this.itemStorage.get(index);
-    }
-
-    @Override
-    public ItemStack removeItem(int index, int count) {
-        return ContainerHelper.removeItem(this.itemStorage, index, count);
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int index) {
-        return ContainerHelper.takeItem(this.itemStorage, index);
-    }
-
-    @Override
-    public void setItem(int index, ItemStack stack) {
-        this.itemStorage.set(index, stack);
-        if (stack.getCount() > this.getMaxStackSize()) {
-            stack.setCount(this.getMaxStackSize());
-        }
-        this.setChanged();
-    }
-
-    @Override
     public boolean canPlaceItem(int index, ItemStack stack) {
         if (Config.DEBUG.get()) {
             StringBuilder message = new StringBuilder();
@@ -114,78 +47,47 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
             }
             Reconstructor.LOGGER.info(message.toString());
         }
-        return stack.isDamageableItem() || isWhitelisted(stack.getItem().getClass().toString());
-    }
-
-
-    @Override
-    public boolean stillValid(Player player) {
-        if (this.level.getBlockEntity(this.worldPosition) != this) {
-            return false;
-        } else {
-            return player.distanceToSqr((double)this.worldPosition.getX() + 0.5D, (double)this.worldPosition.getY() + 0.5D, (double)this.worldPosition.getZ() + 0.5D) <= 64.0D;
-        }
-    }
-
-    @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        this.itemStorage = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        this.setAutoEject(compound.getBoolean("autoEject"));
-        ContainerHelper.loadAllItems(compound, this.itemStorage);
-    }
-
-    @Override
-    public void saveAdditional(CompoundTag compound) {
-        ContainerHelper.saveAllItems(compound, this.itemStorage);
-        compound.putBoolean("autoEject", this.isAutoEject());
-        super.saveAdditional(compound);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-        if (!level.isClientSide) {
-            if (autoEject && isExtractable(this.getItem(0))) {
-                ejectItem();
-            }
-        }
-    }
-
-    private void ejectItem() {
-        if (InventoryHelper.addToPriorityInventory(this.getLevel(), this.worldPosition, getItem(0).copy(), InventoryHelper.getSideList(this.worldPosition, this.getBlockState().getValue(ReconstructorBlock.FACING)))) {
-            this.removeItem(0, 1);
-        }
+        return (stack.isDamageableItem() && stack.isDamaged()) || isWhitelisted(stack.getItem().getClass().toString());
     }
 
     @Override
     protected boolean performWork() {
-        if (this.getItem(0).isEmpty() || !this.getItem(0).isDamaged())
+        EnergyResourceHandler energyStorage = (EnergyResourceHandler) this.configMap.get("power");
+        ItemResourceHandler itemStorage = (ItemResourceHandler) this.configMap.get("items");
+        if (itemStorage.getItem(0).isEmpty() || !itemStorage.getItem(0).isDamaged())
             return false;
-        ItemStack stack = this.getItem(0);
-        int repairAmount = Config.SCALED_REPAIR.get() ? Math.max(1, (stack.getMaxDamage()/1000)) : 1;
+        ItemStack stack = itemStorage.getItem(0);
+        int repairAmount = Config.SCALED_REPAIR.get() ? Math.max(1, (stack.getMaxDamage() / 1000)) : 1;
         stack.setDamageValue(stack.getDamageValue() - repairAmount);
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("Stats")) {
             CompoundTag stats = tag.getCompound("Stats");
-            stats.putBoolean("Broken",false);
+            stats.putBoolean("Broken", false);
             tag.put("Stats", stats);
             stack.setTag(tag);
         }
         return true;
     }
 
-    public boolean isExtractable(ItemStack stack) {
+    public boolean canTakeItem(int slot, ItemStack stack) {
+        if (Config.DEBUG.get()) {
+            Reconstructor.LOGGER.debug("Damage check: {}, Repairable/Whitelisted check: {}, Blacklist check: {}, Restricted check: {}",
+                    !stack.isDamaged(),
+                    !(stack.isRepairable() || isWhitelisted(stack.getItem().getClass().toString())),
+                    Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId()),
+                    (Config.RESTRICT_REPAIRS.get() && !this.isRestrictedItem(stack.getItem()))
+            );
+        }
         return
                 !stack.isDamaged() ||
-                !(
-                        stack.isRepairable() ||
-                        isWhitelisted(stack.getItem().getClass().toString())
-                ) ||
-                Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId()) ||
-                (
-                        Config.RESTRICT_REPAIRS.get() && !this.isRestrictedItem(stack.getItem())
-                );
+                        !(
+                                stack.isRepairable() ||
+                                        isWhitelisted(stack.getItem().getClass().toString())
+                        ) ||
+                        Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId()) ||
+                        (
+                                Config.RESTRICT_REPAIRS.get() && !this.isRestrictedItem(stack.getItem())
+                        );
     }
 
     private boolean isWhitelisted(String className) {
@@ -200,64 +102,30 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
     private boolean isRestrictedItem(Item item) {
         return
                 (item instanceof DiggerItem ||
-                item instanceof ShearsItem ||
-                item instanceof FishingRodItem ||
-                item instanceof ArmorItem ||
-                item instanceof ElytraItem ||
-                item instanceof SwordItem ||
-                item instanceof ShieldItem ||
-                item instanceof BowItem);
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap.equals(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)) {
-            return itemHandler[side != null ? side.ordinal() : 0].cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    @Override
-    public int[] getSlotsForFace(Direction side) {
-        return new int[]{0};
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, @Nullable Direction direction) {
-        return this.canPlaceItem(index, itemStackIn);
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        if (stack.sameItem(getItem(index))) {
-            return isExtractable(getItem(index));
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public void clearContent() {
-
-    }
-
-    public boolean isAutoEject() {
-        return autoEject;
-    }
-
-    public void setAutoEject(boolean newValue) {
-        this.autoEject = newValue;
-        this.setChanged();
+                        item instanceof ShearsItem ||
+                        item instanceof FishingRodItem ||
+                        item instanceof ArmorItem ||
+                        item instanceof ElytraItem ||
+                        item instanceof SwordItem ||
+                        item instanceof ShieldItem ||
+                        item instanceof BowItem);
     }
 
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
-        return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, this.data, DataHelper.getAdjacentNames(this.level, this.worldPosition));
+        return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, new SimpleContainerData(2), DataHelper.getAdjacentNames(this.level, this.worldPosition));
     }
 
     @Override
     protected Component getDefaultName() {
-        return new TranslatableComponent("block.reconstructor.reconstructor");
+        return Component.translatable("block.reconstructor.reconstructor");
+    }
+
+    public boolean stillValid(Player pPlayer) {
+        if (this.level.getBlockEntity(this.worldPosition) != this) {
+            return false;
+        } else {
+            return pPlayer.distanceToSqr((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D) <= 64.0D;
+        }
     }
 }

@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class ReconstructorBlock extends AbstractMachineBlock {
 
@@ -33,7 +33,7 @@ public class ReconstructorBlock extends AbstractMachineBlock {
     }
 
     @Override
-    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, Random pRandom) {
+    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pState.getValue(ACTIVE)) {
             double x = (double) pPos.getX() + 0.5D;
             double y = (double) pPos.getY();
@@ -59,8 +59,8 @@ public class ReconstructorBlock extends AbstractMachineBlock {
         if (oldState.getBlock() != newState.getBlock()) {
             BlockEntity tile = world.getBlockEntity(blockPos);
 
-            if (tile instanceof ReconstructorEntity) {
-                Containers.dropContents(world, blockPos, (ReconstructorEntity) tile);
+            if (tile instanceof ReconstructorEntity reconstructorEntity) {
+                Containers.dropContents(world, blockPos, reconstructorEntity.getInventory());
                 world.updateNeighbourForOutputSignal(blockPos, this);
             }
             super.onRemove(oldState, world, blockPos, newState, flag);
