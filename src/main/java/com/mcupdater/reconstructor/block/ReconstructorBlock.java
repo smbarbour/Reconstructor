@@ -2,27 +2,32 @@ package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineBlock;
 import com.mcupdater.mculib.setup.Registration;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import javax.annotation.Nullable;
 
 public class ReconstructorBlock extends AbstractMachineBlock {
+    public static final MapCodec<ReconstructorBlock> CODEC = simpleCodec(ReconstructorBlock::new);
 
-    public ReconstructorBlock() {
-        super(Properties.of(Material.METAL).sound(SoundType.METAL).strength(10.0f,200.0f).requiresCorrectToolForDrops());
+    @Override
+    protected MapCodec<ReconstructorBlock> codec() {
+        return CODEC;
+    }
+
+    public ReconstructorBlock(BlockBehaviour.Properties properties) {
+        super(properties);
 
     }
 
@@ -50,20 +55,6 @@ public class ReconstructorBlock extends AbstractMachineBlock {
             pLevel.addParticle(ParticleTypes.ELECTRIC_SPARK, x + (axis == Direction.Axis.X ? (double)direction.getStepX() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), y + pRandom.nextDouble(), z + (axis == Direction.Axis.Z ? (double)direction.getStepZ() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), 0.0D, 0.0D, 0.0D);
             pLevel.addParticle(ParticleTypes.ELECTRIC_SPARK, x + (axis == Direction.Axis.X ? (double)direction.getStepX() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), y + pRandom.nextDouble(), z + (axis == Direction.Axis.Z ? (double)direction.getStepZ() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), 0.0D, 0.0D, 0.0D);
             pLevel.addParticle(ParticleTypes.ELECTRIC_SPARK, x + (axis == Direction.Axis.X ? (double)direction.getStepX() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), y + pRandom.nextDouble(), z + (axis == Direction.Axis.Z ? (double)direction.getStepZ() * 0.52D : (pRandom.nextDouble() * 0.6D - 0.3D)), 0.0D, 0.0D, 0.0D);
-        }
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onRemove(BlockState oldState, Level world, BlockPos blockPos, BlockState newState, boolean flag) {
-        if (oldState.getBlock() != newState.getBlock()) {
-            BlockEntity tile = world.getBlockEntity(blockPos);
-
-            if (tile instanceof ReconstructorEntity reconstructorEntity) {
-                Containers.dropContents(world, blockPos, reconstructorEntity.getInventory());
-                world.updateNeighbourForOutputSignal(blockPos, this);
-            }
-            super.onRemove(oldState, world, blockPos, newState, flag);
         }
     }
 

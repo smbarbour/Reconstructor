@@ -1,24 +1,22 @@
 package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineMenu;
+import com.mcupdater.mculib.helpers.DataHelper;
 import com.mcupdater.mculib.inventory.ArmorSlotItemHandler;
 import com.mcupdater.mculib.inventory.MachineInputSlot;
 import com.mcupdater.reconstructor.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 import java.util.Map;
 
@@ -26,13 +24,21 @@ public class ReconstructorMenu extends AbstractMachineMenu<ReconstructorEntity> 
 
     private static final EquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EquipmentSlot[] {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFFHAND};
 
-    public ReconstructorMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, ContainerData data, Map<Direction, Component> directionComponentMap) {
+    public ReconstructorMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player, ContainerData data, Map<Direction, String> directionComponentMap) {
         super((ReconstructorEntity) world.getBlockEntity(pos),Registration.RECONSTRUCTOR_MENU.get(), windowId, world, pos, playerInventory, player, data, directionComponentMap);
+    }
+
+
+    public static ReconstructorMenu factory(int containerId, Inventory playerInv, FriendlyByteBuf extraData) {
+        BlockPos pos = extraData.readBlockPos();
+        Level world = playerInv.player.level();
+        ReconstructorEntity te = (ReconstructorEntity) world.getBlockEntity(pos);
+        return new ReconstructorMenu(containerId, world, pos, playerInv, playerInv.player, new SimpleContainerData(2), DataHelper.readDirectionMap(extraData));
     }
 
     @Override
     protected void addMachineSlots() {
-        addSlot(new MachineInputSlot(this.machineEntity, new InvWrapper(this.machineEntity.getInventory()), 0, 80, 41));
+        addSlot(new MachineInputSlot(this.machineEntity, new InvWrapper(this.machineEntity.getItemHandler()), 0, 80, 41));
     }
 
     @Override
@@ -71,7 +77,7 @@ public class ReconstructorMenu extends AbstractMachineMenu<ReconstructorEntity> 
                 slot.onQuickCraft(stack, itemstack);
             } else {
                 // Move to repair slot if possible
-                if (this.machineEntity.getInventory().getItem(0).isEmpty() && this.machineEntity.canPlaceItem(0, stack)) {
+                if (this.machineEntity.getItemHandler().getItem(0).isEmpty() && this.machineEntity.canPlaceItem(0, stack)) {
                     if (!this.moveItemStackTo(stack, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }

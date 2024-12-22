@@ -5,7 +5,7 @@
 		"corner": "minecraft:block/copper_block",
 		"face": "minecraft:block/iron_block",
 		"inset": "minecraft:block/black_concrete",
-		"overlay": "reconstructor:blocks/hammer",
+		"overlay": "reconstructor:block/hammer",
 		"particle": "minecraft:block/copper_block"
 	}
 }

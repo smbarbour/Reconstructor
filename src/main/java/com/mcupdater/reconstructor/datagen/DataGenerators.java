@@ -1,21 +1,27 @@
 package com.mcupdater.reconstructor.datagen;
 
 import com.mcupdater.reconstructor.Reconstructor;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.data.PackOutput;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-@Mod.EventBusSubscriber(modid = Reconstructor.MODID,bus = Mod.EventBusSubscriber.Bus.MOD)
+import java.util.concurrent.CompletableFuture;
+
+@EventBusSubscriber(modid = Reconstructor.MODID,bus = EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
 
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
         DataGenerator dataGenerator = event.getGenerator();
+        PackOutput output = dataGenerator.getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
-        dataGenerator.addProvider(true, new ModRecipeProvider(dataGenerator));
-        dataGenerator.addProvider(true, new ModBlockTagsProvider(dataGenerator, Reconstructor.MODID, existingFileHelper));
+        dataGenerator.addProvider(event.includeServer(), new ModRecipeProvider(output, lookupProvider));
+        dataGenerator.addProvider(event.includeServer(), new ModBlockTagsProvider(output, lookupProvider, existingFileHelper));
     }
 }

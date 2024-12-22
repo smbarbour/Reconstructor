@@ -8,7 +8,6 @@ import com.mcupdater.mculib.helpers.DebugHelper;
 import com.mcupdater.reconstructor.Reconstructor;
 import com.mcupdater.reconstructor.setup.Config;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -59,6 +58,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
         ItemStack stack = itemStorage.getItem(0);
         int repairAmount = Config.SCALED_REPAIR.get() ? Math.max(1, (stack.getMaxDamage() / 1000)) : 1;
         stack.setDamageValue(stack.getDamageValue() - repairAmount);
+        /* TODO - Reimplement tag handling
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.contains("Stats")) {
             CompoundTag stats = tag.getCompound("Stats");
@@ -66,6 +66,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
             tag.put("Stats", stats);
             stack.setTag(tag);
         }
+        */
         return true;
     }
 

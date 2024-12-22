@@ -1,25 +1,34 @@
 package com.mcupdater.reconstructor.datagen;
 
 import com.mcupdater.reconstructor.setup.Registration;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
-public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
-    public ModRecipeProvider(DataGenerator dataGenerator) {
-        super(dataGenerator);
+public class ModRecipeProvider extends RecipeProvider {
+    public ModRecipeProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(packOutput, lookupProvider);
     }
 
     @Override
-    protected void buildCraftingRecipes(@NotNull Consumer<FinishedRecipe> finishedRecipeConsumer) {
-        ShapedRecipeBuilder.shaped(Registration.RECONSTRUCTOR_BLOCK.get()).define('C', Ingredient.of(Items.COPPER_INGOT)).define('F',Ingredient.of(Items.IRON_INGOT)).define('#', Ingredient.of(Blocks.GRINDSTONE)).define('R', Ingredient.of(Items.REDSTONE)).pattern("CFC").pattern("F#F").pattern("CRC").unlockedBy("has_copper", has(Items.COPPER_INGOT)).save(finishedRecipeConsumer);
+    protected void buildRecipes(RecipeOutput output) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, Registration.RECONSTRUCTOR_BLOCK.get())
+                .define('C', Ingredient.of(Items.COPPER_INGOT))
+                .define('F',Ingredient.of(Items.IRON_INGOT))
+                .define('#', Ingredient.of(Blocks.GRINDSTONE))
+                .define('R', Ingredient.of(Items.REDSTONE))
+                .pattern("CFC")
+                .pattern("F#F")
+                .pattern("CRC")
+                .unlockedBy("has_copper", has(Items.COPPER_INGOT))
+                .save(output);
     }
 }

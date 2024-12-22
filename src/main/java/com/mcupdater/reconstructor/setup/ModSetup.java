@@ -1,13 +1,13 @@
 package com.mcupdater.reconstructor.setup;
 
-import com.mcupdater.reconstructor.Reconstructor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import com.mcupdater.reconstructor.block.ReconstructorScreen;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
-@Mod.EventBusSubscriber(modid = Reconstructor.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModSetup {
 
     public static void init(final FMLCommonSetupEvent event) {
         //ReconstructorChannel.init();
     }
+
 }

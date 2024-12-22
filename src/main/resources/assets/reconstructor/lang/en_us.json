@@ -1,5 +1,14 @@
 {
     "block.reconstructor.reconstructor": "Reconstructor",
     "message.energy": "Energy:",
-    "itemGroup.reconstructor": "Reconstructor"
+    "itemGroup.reconstructor": "Reconstructor",
+    "reconstructor.config.general": "General Settings",
+    "reconstructor.config.general.energy_use": "Energy Used",
+    "reconstructor.config.general.storage_multiplier": "Energy Storage Multiplier",
+    "reconstructor.config.general.restrict": "Restrict Repairs",
+    "reconstructor.config.general.scaled": "Scale Repairs",
+    "reconstructor.config.general.whitelist": "Item Whitelist",
+    "reconstructor.config.general.blacklist": "Item Blacklist",
+    "reconstructor.config.debug": "Debug Settings",
+    "reconstructor.config.debug.debug": "Enable Debugging"
 }

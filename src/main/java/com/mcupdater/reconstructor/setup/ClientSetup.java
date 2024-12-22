@@ -1,12 +1,25 @@
 package com.mcupdater.reconstructor.setup;
 
+import com.mcupdater.reconstructor.Reconstructor;
 import com.mcupdater.reconstructor.block.ReconstructorScreen;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
+@EventBusSubscriber(value=Dist.CLIENT, modid= Reconstructor.MODID, bus=EventBusSubscriber.Bus.MOD)
 public class ClientSetup {
-    public static void init(final FMLClientSetupEvent event) {
-        MenuScreens.register(Registration.RECONSTRUCTOR_MENU.get(), ReconstructorScreen::new);
+
+    @SubscribeEvent
+    public static void buildContents(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTab() == com.mcupdater.mculib.setup.Registration.ITEM_GROUP.get()) {
+            event.accept(Registration.RECONSTRUCTOR_BLOCK.get());
+        }
     }
 
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(Registration.RECONSTRUCTOR_MENU.get(), ReconstructorScreen::new);
+    }
 }
