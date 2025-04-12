@@ -5,6 +5,7 @@ import com.mcupdater.reconstructor.setup.Config;
 import com.mcupdater.reconstructor.setup.ModSetup;
 import com.mcupdater.reconstructor.setup.Registration;
 import com.mojang.logging.LogUtils;
+import net.minecraft.world.item.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -28,4 +29,30 @@ public class Reconstructor
         modEventBus.addListener(ModSetup::init);
     }
 
+    public static boolean canRepair(ItemStack stack) {
+        return !isBlacklisted(stack) &&
+                (stack.isDamageableItem() && stack.isDamaged()) &&
+                (stack.isRepairable() || isWhitelisted(stack)) &&
+                (Config.RESTRICT_REPAIRS.get() ? isRestrictedItem(stack.getItem()) : true);
+    }
+
+    private static boolean isBlacklisted(ItemStack stack) {
+        return Config.BLACKLIST.get().contains(stack.getItem().getClass().toString());
+    }
+
+    private static boolean isWhitelisted(ItemStack stack) {
+        return Config.WHITELIST.get().contains(stack.getItem().getClass().toString());
+    }
+
+    private static boolean isRestrictedItem(Item item) {
+        return
+                (item instanceof DiggerItem ||
+                        item instanceof ShearsItem ||
+                        item instanceof FishingRodItem ||
+                        item instanceof ArmorItem ||
+                        item instanceof ElytraItem ||
+                        item instanceof SwordItem ||
+                        item instanceof ShieldItem ||
+                        item instanceof BowItem);
+    }
 }

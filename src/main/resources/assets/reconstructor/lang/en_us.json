@@ -1,5 +1,6 @@
 {
     "block.reconstructor.reconstructor": "Reconstructor",
+    "item.reconstructor.portable_reconstructor": "Portable Reconstructor",
     "message.energy": "Energy:",
     "itemGroup.reconstructor": "Reconstructor",
     "reconstructor.config.general": "General Settings",
@@ -10,5 +11,6 @@
     "reconstructor.config.general.whitelist": "Item Whitelist",
     "reconstructor.config.general.blacklist": "Item Blacklist",
     "reconstructor.config.debug": "Debug Settings",
-    "reconstructor.config.debug.debug": "Enable Debugging"
+    "reconstructor.config.debug.debug": "Enable Debugging",
+    "curios.identifier.reconstructor": "Reconstructor"
 }

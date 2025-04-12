@@ -10,6 +10,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -29,6 +30,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern("F#F")
                 .pattern("CRC")
                 .unlockedBy("has_copper", has(Items.COPPER_INGOT))
+                .save(output);
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Registration.PORTABLE_RECONSTRUCTOR.get())
+                .define('G', Ingredient.of(Tags.Items.INGOTS_GOLD))
+                .define('R', Ingredient.of(Registration.RECONSTRUCTOR_BLOCKITEM.get()))
+                .pattern("GGG")
+                .pattern("GRG")
+                .pattern("GGG")
+                .unlockedBy("has_reconstructor", has(Registration.RECONSTRUCTOR_BLOCKITEM.get()))
                 .save(output);
     }
 }

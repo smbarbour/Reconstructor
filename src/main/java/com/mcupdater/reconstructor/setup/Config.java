@@ -15,6 +15,7 @@ public class Config {
     public static ModConfigSpec.BooleanValue SCALED_REPAIR;
     public static ModConfigSpec.ConfigValue<List<? extends String>> BLACKLIST;
     public static ModConfigSpec.ConfigValue<List<? extends String>> WHITELIST;
+    public static ModConfigSpec.IntValue COOLDOWN;
 
     public static ModConfigSpec.BooleanValue DEBUG;
 
@@ -30,6 +31,7 @@ public class Config {
         SCALED_REPAIR = COMMON_BUILDER.comment("Repair amount per tick will scale based on durability").translation("reconstructor.config.general.scaled").define("Scaled", true);
         BLACKLIST = COMMON_BUILDER.comment("Item classes that appear in this list will not be repaired by the Reconstructor.").translation("reconstructor.config.general.blacklist").defineList("blacklist", new ArrayList<String>(), (Object o) -> true);
         WHITELIST = COMMON_BUILDER.comment("Package names of mods that should be repaired by the Reconstructor.").translation("reconstructor.config.general.whitelist").defineList("whitelist", Arrays.asList("slimeknights.tconstruct","landmaster.plustic.tools","c4.conarm.common.items.armor"), (Object o) -> true);
+        COOLDOWN = COMMON_BUILDER.comment("Number of ticks between repair ticks for the Portable Reconstructor").translation("reconstructor.config.general.cooldown").defineInRange("cooldown",10,0,Integer.MAX_VALUE);
         COMMON_BUILDER.pop();
 
         COMMON_BUILDER.comment("Debug settings").translation("reconstructor.config.debug").push(CATEGORY_DEBUG);

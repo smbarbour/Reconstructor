@@ -15,6 +15,7 @@ public class ClientSetup {
     public static void buildContents(BuildCreativeModeTabContentsEvent event) {
         if (event.getTab() == com.mcupdater.mculib.setup.Registration.ITEM_GROUP.get()) {
             event.accept(Registration.RECONSTRUCTOR_BLOCK.get());
+            event.accept(Registration.PORTABLE_RECONSTRUCTOR.get());
         }
     }
 

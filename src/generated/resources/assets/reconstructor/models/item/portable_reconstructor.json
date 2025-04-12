@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "reconstructor:item/handheld_blank",
+    "layer1": "reconstructor:block/hammer"
+  }
+}

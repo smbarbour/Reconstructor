@@ -2,6 +2,8 @@ package com.mcupdater.reconstructor.setup;
 
 import com.mcupdater.reconstructor.Reconstructor;
 import com.mcupdater.reconstructor.block.ReconstructorEntity;
+import com.mcupdater.reconstructor.item.ItemEnergyStorage;
+import com.mcupdater.reconstructor.item.PortableReconstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -30,5 +32,10 @@ public class EventHandlers {
 				Capabilities.ItemHandler.BLOCK,
 				Registration.RECONSTRUCTOR_ENTITY.get(),
 				(blockEntity, side) -> side != null ? blockEntity.getItemHandler().getItemHandler(side) : blockEntity.getItemHandler().getInternalHandler());
+		event.registerItem(
+				Capabilities.EnergyStorage.ITEM,
+				(stack, unused) -> new ItemEnergyStorage(stack, Config.ENERGY_PER_POINT.get() * Config.STORAGE_MULTIPLIER.get(), 10000),
+				Registration.PORTABLE_RECONSTRUCTOR.get()
+		);
 	}
 }

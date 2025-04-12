@@ -46,7 +46,8 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
             }
             Reconstructor.LOGGER.info(message.toString());
         }
-        return (stack.isDamageableItem() && stack.isDamaged()) || isWhitelisted(stack.getItem().getClass().toString());
+        return Reconstructor.canRepair(stack);
+        //(stack.isDamageableItem() && stack.isDamaged()) || isWhitelisted(stack.getItem().getClass().toString());
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
                         );
     }
 
-    private boolean isWhitelisted(String className) {
+    public static boolean isWhitelisted(String className) {
         for (String entry : Config.WHITELIST.get()) {
             if (className.contains(entry)) {
                 return true;

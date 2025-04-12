@@ -3,7 +3,12 @@ package com.mcupdater.reconstructor.setup;
 import com.mcupdater.reconstructor.block.ReconstructorBlock;
 import com.mcupdater.reconstructor.block.ReconstructorEntity;
 import com.mcupdater.reconstructor.block.ReconstructorMenu;
+import com.mcupdater.reconstructor.item.PortableReconstructor;
+import com.mojang.serialization.Codec;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -27,12 +32,14 @@ public class Registration {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MODID);
     private static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(BuiltInRegistries.MENU, MODID);
+    public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MODID);
 
     public static void init(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
         MENUS.register(modEventBus);
+        DATA_COMPONENTS.register(modEventBus);
     }
 
     public static final DeferredBlock<ReconstructorBlock> RECONSTRUCTOR_BLOCK = BLOCKS.register(
@@ -56,4 +63,13 @@ public class Registration {
             "reconstructor",
             () -> IMenuTypeExtension.create(ReconstructorMenu::factory)
     );
+
+    public static final DeferredItem<Item> PORTABLE_RECONSTRUCTOR = ITEMS.register("portable_reconstructor",
+            () -> new PortableReconstructor(new Item.Properties()
+                    .stacksTo(1)
+                    .setNoRepair()
+            ));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> STORED_ENERGY = DATA_COMPONENTS.register("energy", () -> DataComponentType.<Integer>builder().persistent(Codec.INT.orElse(0)).networkSynchronized(ByteBufCodecs.VAR_INT).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COOLDOWN = DATA_COMPONENTS.register("cooldown", () -> DataComponentType.<Integer>builder().persistent(Codec.INT.orElse(0)).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 }
