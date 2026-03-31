@@ -11,7 +11,7 @@ description='''${mod_description}'''
 [[dependencies.${mod_id}]] #optional
 modId="neoforge" #mandatory
 type="required" #mandatory
-versionRange="${neo_version_range}" #mandatory
+versionRange="${neo_version}" #mandatory
 ordering="NONE"
 side="BOTH"
 
@@ -25,6 +25,6 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="mculib"
 type="required"
-versionRange="[1.5,)"
+versionRange="[${mculib_version},)"
 ordering="NONE"
 side="BOTH"

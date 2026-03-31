@@ -1,7 +1,7 @@
 package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineBlock;
-import com.mcupdater.mculib.setup.Registration;
+import com.mcupdater.mculib.setup.MCULibRegistration;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,7 +43,7 @@ public class ReconstructorBlock extends AbstractMachineBlock {
             double x = (double) pPos.getX() + 0.5D;
             double y = (double) pPos.getY();
             double z = (double) pPos.getZ() + 0.5D;
-            pLevel.playLocalSound(x, y, z, Registration.MACHINE_HUM.get(), SoundSource.BLOCKS, 1.0F, 1.0F, false);
+            pLevel.playLocalSound(x, y, z, MCULibRegistration.MACHINE_HUM.get(), SoundSource.BLOCKS, 1.0F, 1.0F, false);
             if (pRandom.nextDouble() < 0.1D) {
                 pLevel.playLocalSound(x, y, z, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
