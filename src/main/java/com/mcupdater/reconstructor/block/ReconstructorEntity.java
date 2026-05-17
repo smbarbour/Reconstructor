@@ -1,7 +1,6 @@
 package com.mcupdater.reconstructor.block;
 
 import com.mcupdater.mculib.block.AbstractMachineBlockEntity;
-import com.mcupdater.mculib.capabilities.EnergyResourceHandler;
 import com.mcupdater.mculib.capabilities.ItemResourceHandler;
 import com.mcupdater.mculib.helpers.DataHelper;
 import com.mcupdater.mculib.helpers.DebugHelper;
@@ -15,6 +14,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -34,6 +34,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
         if (Config.DEBUG.get()) {
             StringBuilder message = new StringBuilder();
             message.append("Item details for ").append(stack.getItem().getDescriptionId()).append("\n");
+            message.append("Is Damageable: ").append(stack.isDamageableItem()).append("\n");
             message.append("Is Damaged: ").append(stack.isDamaged()).append("\n");
             message.append("Is Repairable: ").append(stack.isRepairable()).append("\n");
             message.append("Is Whitelisted: ").append(isWhitelisted(stack.getItem().getClass().toString())).append("\n");
@@ -52,7 +53,6 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
 
     @Override
     protected boolean performWork() {
-        EnergyResourceHandler energyStorage = (EnergyResourceHandler) this.configMap.get("power");
         ItemResourceHandler itemStorage = (ItemResourceHandler) this.configMap.get("items");
         if (itemStorage.getItem(0).isEmpty() || !itemStorage.getItem(0).isDamaged())
             return false;
@@ -88,7 +88,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
                         ) ||
                         Config.BLACKLIST.get().contains(stack.getItem().getDescriptionId()) ||
                         (
-                                Config.RESTRICT_REPAIRS.get() && !this.isRestrictedItem(stack.getItem())
+                                !Config.RESTRICT_REPAIRS.get() || this.isRestrictedItem(stack.getItem())
                         );
     }
 
@@ -114,7 +114,7 @@ public class ReconstructorEntity extends AbstractMachineBlockEntity {
     }
 
     @Override
-    public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player playerEntity) {
+    public AbstractContainerMenu createMenu(int i, @NotNull Inventory playerInventory, @NotNull Player playerEntity) {
         return new ReconstructorMenu(i, this.level, this.worldPosition, playerInventory, playerEntity, new SimpleContainerData(2), DataHelper.getAdjacentNames(this.level, this.worldPosition));
     }
 

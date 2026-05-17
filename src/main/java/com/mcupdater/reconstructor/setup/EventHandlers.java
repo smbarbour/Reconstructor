@@ -18,7 +18,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
-@EventBusSubscriber(modid= Reconstructor.MODID, bus= EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid= Reconstructor.MODID)
 public class EventHandlers {
 
 	@SubscribeEvent

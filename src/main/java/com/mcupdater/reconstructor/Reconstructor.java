@@ -1,18 +1,14 @@
 package com.mcupdater.reconstructor;
 
-import com.mcupdater.reconstructor.setup.ClientSetup;
 import com.mcupdater.reconstructor.setup.Config;
 import com.mcupdater.reconstructor.setup.ModSetup;
 import com.mcupdater.reconstructor.setup.Registration;
 import com.mojang.logging.LogUtils;
 import net.minecraft.world.item.*;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -33,7 +29,7 @@ public class Reconstructor
         return !isBlacklisted(stack) &&
                 (stack.isDamageableItem() && stack.isDamaged()) &&
                 (stack.isRepairable() || isWhitelisted(stack)) &&
-                (Config.RESTRICT_REPAIRS.get() ? isRestrictedItem(stack.getItem()) : true);
+                (!Config.RESTRICT_REPAIRS.get() || isRestrictedItem(stack.getItem()));
     }
 
     private static boolean isBlacklisted(ItemStack stack) {
@@ -41,7 +37,12 @@ public class Reconstructor
     }
 
     private static boolean isWhitelisted(ItemStack stack) {
-        return Config.WHITELIST.get().contains(stack.getItem().getClass().toString());
+        String className = stack.getItem().getClass().toString();
+        for (String entry : Config.WHITELIST.get()) {
+            if (className.contains(entry))
+                return true;
+        }
+        return false;
     }
 
     private static boolean isRestrictedItem(Item item) {
