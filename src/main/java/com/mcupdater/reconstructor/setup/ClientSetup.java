@@ -8,7 +8,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
-@EventBusSubscriber(value=Dist.CLIENT, modid= Reconstructor.MODID, bus=EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value=Dist.CLIENT, modid= Reconstructor.MODID)
 public class ClientSetup {
 
     @SubscribeEvent
